@@ -1,12 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
 package com.mesofi.myth.collection.mgmt.controller;
 
 import com.mesofi.myth.collection.mgmt.model.Figurine;
 import com.mesofi.myth.collection.mgmt.service.MythCollectionService;
+import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,21 +22,23 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Validated
 @RestController
 @AllArgsConstructor
-@RequestMapping("/figurines")
+@RequestMapping(MythCollectionController.MAPPING)
 @CrossOrigin(origins = "http://localhost:3000")
 public class MythCollectionController {
 
-  private final MythCollectionService service;
+  public static final String MAPPING = "/figurines";
+
+  final MythCollectionService service;
 
   @PostMapping
   public ResponseEntity<Figurine> createFigurine(
-      @RequestBody Figurine figurine, UriComponentsBuilder urBuilder) {
+      @RequestBody @Valid Figurine figurine, UriComponentsBuilder urBuilder) {
 
     Figurine newFigurine = service.createFigurine(figurine);
 
     // Build the URI for the newly created resource
-    String location =
-        urBuilder.path("/figurines/{id}").buildAndExpand(newFigurine.id()).toUriString();
+    String pathLocation = MAPPING + "/{id}";
+    String location = urBuilder.path(pathLocation).buildAndExpand(newFigurine.id()).toUriString();
 
     // Return 201 Created with Location header and the created figurine
     return ResponseEntity.created(URI.create(location)).body(newFigurine);

@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: myth-collection-mgmt
+# Enable throwing an exception when no handler is found
+  mvc:
+    throw-exception-if-no-handler-found: true
+# Disable Spring Boot's default static resource handling
+  resources:
+    add-mappings: false
+
+#logging.level.org.springframework: DEBUG

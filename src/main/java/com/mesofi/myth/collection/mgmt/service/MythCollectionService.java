@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class MythCollectionService {
 
   public Figurine createFigurine(Figurine figurine) {
-    log.info("ddd");
-    return new Figurine(1);
+    log.info("A new figure is about to be created ...");
+    return new Figurine("1", "d");
   }
 }
