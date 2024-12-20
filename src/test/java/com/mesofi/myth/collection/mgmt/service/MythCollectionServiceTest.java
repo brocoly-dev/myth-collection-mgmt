@@ -21,7 +21,7 @@ public class MythCollectionServiceTest {
   @InjectMocks private MythCollectionService service;
 
   @Test
-  void createFigurine_whenFigurinePopulate_thenCreateFigurineAndReturnSaved() {
+  void createFigurine_whenFigurinePopulated_thenCreateFigurineAndReturnSaved() {
 
     // Arrange
     Figurine figurineToSave = new Figurine(null, "Seiya");

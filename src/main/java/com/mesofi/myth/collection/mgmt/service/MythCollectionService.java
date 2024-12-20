@@ -16,6 +16,8 @@ public class MythCollectionService {
   public Figurine createFigurine(Figurine figurine) {
     log.info("A new figure is about to be created ...");
 
-    return repository.save(figurine);
+    Figurine created = repository.save(figurine);
+    log.info("A new figure has been created with id: {}", created.id());
+    return created;
   }
 }
