@@ -28,7 +28,7 @@ public class MythCollectionController {
 
   public static final String MAPPING = "/figurines";
 
-  final MythCollectionService service;
+  private final MythCollectionService service;
 
   @PostMapping
   public ResponseEntity<Figurine> createFigurine(

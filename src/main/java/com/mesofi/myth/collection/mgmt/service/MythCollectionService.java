@@ -1,15 +1,21 @@
 package com.mesofi.myth.collection.mgmt.service;
 
 import com.mesofi.myth.collection.mgmt.model.Figurine;
+import com.mesofi.myth.collection.mgmt.repository.MythCollectionRepository;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class MythCollectionService {
+
+  private final MythCollectionRepository repository;
 
   public Figurine createFigurine(Figurine figurine) {
     log.info("A new figure is about to be created ...");
-    return new Figurine("1", "d");
+
+    return repository.save(figurine);
   }
 }
