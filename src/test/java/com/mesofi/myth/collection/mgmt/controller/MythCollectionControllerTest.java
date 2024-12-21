@@ -123,12 +123,31 @@ public class MythCollectionControllerTest {
   }
 
   @Test
+  void createFigurine_whenTamashiiUrlTooLong_thenReturnBadRequest() throws Exception {
+    String payload = loadPayload("tamashiiUrl_tooLong_field.json");
+
+    mockMvc
+        .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
+        .andDo(print())
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("Bad Request"))
+        .andExpect(jsonPath("$.messages").isArray())
+        .andExpect(jsonPath("$.messages", hasSize(1)))
+        .andExpect(
+            jsonPath("$.messages").value(hasItem("tamashiiUrl: size must be between 0 and 35")))
+        .andExpect(jsonPath("$.path").value(PATH));
+
+    verify(service, times(0)).createFigurine(any(Figurine.class));
+  }
+
+  @Test
   void createFigurine_whenSucessPayload_thenReturnCreated() throws Exception {
     String payload = loadPayload("success_payload.json");
 
     Figurine newFigurine = fromJsonToObject(Figurine.class, payload);
 
-    when(service.createFigurine(newFigurine)).thenReturn(new Figurine("1", newFigurine.baseName()));
+    when(service.createFigurine(newFigurine))
+        .thenReturn(new Figurine("1", newFigurine.baseName(), newFigurine.tamashiiUrl()));
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
@@ -136,7 +155,8 @@ public class MythCollectionControllerTest {
         .andExpect(status().isCreated())
         .andExpect(header().string("Location", "http://localhost/figurines/1"))
         .andExpect(jsonPath("$.id").value("1"))
-        .andExpect(jsonPath("$.baseName").value("Seiya"));
+        .andExpect(jsonPath("$.baseName").value("Seiya"))
+        .andExpect(jsonPath("$.tamashiiUrl").value("https://tamashiiweb.com/item/000"));
 
     verify(service, times(1)).createFigurine(newFigurine);
   }

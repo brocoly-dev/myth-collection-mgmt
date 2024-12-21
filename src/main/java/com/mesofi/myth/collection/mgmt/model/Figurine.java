@@ -6,4 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "figurines")
-public record Figurine(@Id String id, @NotBlank @Size(min = 3, max = 20) String baseName) {}
+public record Figurine(
+    @Id String id,
+    @NotBlank @Size(min = 3, max = 20) String baseName,
+    @Size(max = 35) String tamashiiUrl) {}

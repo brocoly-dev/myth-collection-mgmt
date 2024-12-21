@@ -16,7 +16,7 @@ public class MythCollectionRepositoryTest {
 
   @Test
   void save_whenFigurinePopulated_thenCreateFigurineAndReturnSaved() {
-    Figurine figurineToSave = new Figurine(null, "Seiya");
+    Figurine figurineToSave = new Figurine(null, "Seiya", "https://tamashiiweb.com/item/000");
     Figurine savedFigurine = repository.save(figurineToSave);
 
     assertThat(repository.findById(savedFigurine.id())).isPresent();
