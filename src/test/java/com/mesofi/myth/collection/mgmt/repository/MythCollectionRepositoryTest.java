@@ -6,8 +6,10 @@ import com.mesofi.myth.collection.mgmt.model.Figurine;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.test.context.ActiveProfiles;
 
 @DataMongoTest
+@ActiveProfiles("itest")
 public class MythCollectionRepositoryTest {
 
   @Autowired private MythCollectionRepository repository;
