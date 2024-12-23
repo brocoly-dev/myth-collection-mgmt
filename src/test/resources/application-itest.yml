@@ -1,0 +1,11 @@
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 5.0.5
+
+spring:
+  data:
+    mongodb:
+      host: localhost
+      database: myth-collection-itest
