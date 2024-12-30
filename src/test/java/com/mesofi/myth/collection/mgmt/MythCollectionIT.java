@@ -20,8 +20,8 @@ public class MythCollectionIT {
 
   @Test
   void execute_createNewFigurine() {
-    String request = loadPayload("createNewFigurine/request.json");
-    String response = loadPayload("createNewFigurine/response.json");
+    String request = loadPayload("it/createNewFigurine/request.json");
+    String response = loadPayload("it/createNewFigurine/response.json");
 
     final String uri = MythCollectionController.MAPPING;
 

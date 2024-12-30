@@ -15,8 +15,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.mesofi.myth.collection.mgmt.model.Figurine;
-import com.mesofi.myth.collection.mgmt.service.MythCollectionService;
+import com.mesofi.myth.collection.mgmt.model.Distributor;
+import com.mesofi.myth.collection.mgmt.service.DistributorService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,18 +26,18 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(MythCollectionController.class)
-public class MythCollectionControllerTest {
+@WebMvcTest(DistributorController.class)
+public class DistributorControllerTest {
 
   @Autowired private MockMvc mockMvc; // MockMvc is used to simulate HTTP requests
 
-  @MockitoBean private MythCollectionService service; // Mock the service layer
+  @MockitoBean private DistributorService service; // Mock the service layer
 
-  private final String PATH = "/figurines";
+  private final String PATH = "/distributors";
 
   @Test
-  void createFigurine_whenInvalidPath_thenReturnNotFound() throws Exception {
-    String payload = loadPayload("figurines/missing_payload.json");
+  void createDistributor_whenInvalidPath_thenReturnNotFound() throws Exception {
+    String payload = loadPayload("distributors/missing_payload.json");
 
     mockMvc
         .perform(post("/invalid-path").contentType(APPLICATION_JSON).content(payload))
@@ -51,12 +51,12 @@ public class MythCollectionControllerTest {
                 .value(hasItem("The requested URL was not found on this server.")))
         .andExpect(jsonPath("$.path").value("/invalid-path"));
 
-    verify(service, times(0)).createFigurine(any(Figurine.class));
+    verify(service, times(0)).createDistributor(any(Distributor.class));
   }
 
   @Test
-  void createFigurine_whenMissingBody_thenReturnBadRequest() throws Exception {
-    String payload = loadPayload("figurines/missing_payload.json");
+  void createDistributor_whenMissingBody_thenReturnBadRequest() throws Exception {
+    String payload = loadPayload("distributors/missing_payload.json");
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
@@ -68,12 +68,12 @@ public class MythCollectionControllerTest {
         .andExpect(jsonPath("$.messages").value(hasItem("The required request body is missing.")))
         .andExpect(jsonPath("$.path").value(PATH));
 
-    verify(service, times(0)).createFigurine(any(Figurine.class));
+    verify(service, times(0)).createDistributor(any(Distributor.class));
   }
 
   @Test
-  void createFigurine_whenEmptyBody_thenReturnBadRequest() throws Exception {
-    String payload = loadPayload("figurines/empty_payload.json");
+  void createDistributor_whenEmptyBody_thenReturnBadRequest() throws Exception {
+    String payload = loadPayload("distributors/empty_payload.json");
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
@@ -82,15 +82,15 @@ public class MythCollectionControllerTest {
         .andExpect(jsonPath("$.error").value("Bad Request"))
         .andExpect(jsonPath("$.messages").isArray())
         .andExpect(jsonPath("$.messages", hasSize(1)))
-        .andExpect(jsonPath("$.messages").value(hasItem("baseName: must not be blank")))
+        .andExpect(jsonPath("$.messages").value(hasItem("name: must not be blank")))
         .andExpect(jsonPath("$.path").value(PATH));
 
-    verify(service, times(0)).createFigurine(any(Figurine.class));
+    verify(service, times(0)).createDistributor(any(Distributor.class));
   }
 
   @Test
-  void createFigurine_whenBaseNameTooShort_thenReturnBadRequest() throws Exception {
-    String payload = loadPayload("figurines/baseName_tooShort_field.json");
+  void createDistributor_whenNameTooShort_thenReturnBadRequest() throws Exception {
+    String payload = loadPayload("distributors/name_tooShort_field.json");
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
@@ -99,15 +99,15 @@ public class MythCollectionControllerTest {
         .andExpect(jsonPath("$.error").value("Bad Request"))
         .andExpect(jsonPath("$.messages").isArray())
         .andExpect(jsonPath("$.messages", hasSize(1)))
-        .andExpect(jsonPath("$.messages").value(hasItem("baseName: size must be between 3 and 20")))
+        .andExpect(jsonPath("$.messages").value(hasItem("name: size must be between 3 and 20")))
         .andExpect(jsonPath("$.path").value(PATH));
 
-    verify(service, times(0)).createFigurine(any(Figurine.class));
+    verify(service, times(0)).createDistributor(any(Distributor.class));
   }
 
   @Test
-  void createFigurine_whenBaseNameTooLong_thenReturnBadRequest() throws Exception {
-    String payload = loadPayload("figurines/baseName_tooLong_field.json");
+  void createDistributor_whenNameTooLong_thenReturnBadRequest() throws Exception {
+    String payload = loadPayload("distributors/name_tooLong_field.json");
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
@@ -116,48 +116,29 @@ public class MythCollectionControllerTest {
         .andExpect(jsonPath("$.error").value("Bad Request"))
         .andExpect(jsonPath("$.messages").isArray())
         .andExpect(jsonPath("$.messages", hasSize(1)))
-        .andExpect(jsonPath("$.messages").value(hasItem("baseName: size must be between 3 and 20")))
+        .andExpect(jsonPath("$.messages").value(hasItem("name: size must be between 3 and 20")))
         .andExpect(jsonPath("$.path").value(PATH));
 
-    verify(service, times(0)).createFigurine(any(Figurine.class));
+    verify(service, times(0)).createDistributor(any(Distributor.class));
   }
 
   @Test
-  void createFigurine_whenTamashiiUrlTooLong_thenReturnBadRequest() throws Exception {
-    String payload = loadPayload("figurines/tamashiiUrl_tooLong_field.json");
+  void createDistributor_whenSucessPayload_thenReturnCreated() throws Exception {
+    String payload = loadPayload("distributors/success_payload.json");
 
-    mockMvc
-        .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
-        .andDo(print())
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.error").value("Bad Request"))
-        .andExpect(jsonPath("$.messages").isArray())
-        .andExpect(jsonPath("$.messages", hasSize(1)))
-        .andExpect(
-            jsonPath("$.messages").value(hasItem("tamashiiUrl: size must be between 0 and 35")))
-        .andExpect(jsonPath("$.path").value(PATH));
+    Distributor newDistributor = fromJsonToObject(Distributor.class, payload);
 
-    verify(service, times(0)).createFigurine(any(Figurine.class));
-  }
-
-  @Test
-  void createFigurine_whenSucessPayload_thenReturnCreated() throws Exception {
-    String payload = loadPayload("figurines/success_payload.json");
-
-    Figurine newFigurine = fromJsonToObject(Figurine.class, payload);
-
-    when(service.createFigurine(newFigurine))
-        .thenReturn(new Figurine("1", newFigurine.baseName(), newFigurine.tamashiiUrl()));
+    when(service.createDistributor(newDistributor))
+        .thenReturn(new Distributor("1", newDistributor.getName()));
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
         .andDo(print())
         .andExpect(status().isCreated())
-        .andExpect(header().string("Location", "http://localhost/figurines/1"))
+        .andExpect(header().string("Location", "http://localhost/distributors/1"))
         .andExpect(jsonPath("$.id").value("1"))
-        .andExpect(jsonPath("$.baseName").value("Seiya"))
-        .andExpect(jsonPath("$.tamashiiUrl").value("https://tamashiiweb.com/item/000"));
+        .andExpect(jsonPath("$.name").value("DTM"));
 
-    verify(service, times(1)).createFigurine(newFigurine);
+    verify(service, times(1)).createDistributor(newDistributor);
   }
 }
