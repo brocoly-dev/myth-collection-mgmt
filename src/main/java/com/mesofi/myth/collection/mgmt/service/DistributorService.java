@@ -1,5 +1,6 @@
 package com.mesofi.myth.collection.mgmt.service;
 
+import com.mesofi.myth.collection.mgmt.exceptions.CatalogItemNotFoundException;
 import com.mesofi.myth.collection.mgmt.model.Distributor;
 import com.mesofi.myth.collection.mgmt.repository.DistributorRepository;
 import java.util.List;
@@ -43,7 +44,7 @@ public class DistributorService {
     repository.deleteById(id);
   }
 
-  private Supplier<IllegalArgumentException> notFound(final String message) {
-    return () -> new IllegalArgumentException(message);
+  private Supplier<CatalogItemNotFoundException> notFound(final String message) {
+    return () -> new CatalogItemNotFoundException(message);
   }
 }
