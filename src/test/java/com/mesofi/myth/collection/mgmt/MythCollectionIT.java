@@ -4,9 +4,11 @@ import static com.mesofi.myth.collection.mgmt.common.TestUtils.loadPayload;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+import com.mesofi.myth.collection.mgmt.controller.DistributorController;
 import com.mesofi.myth.collection.mgmt.controller.MythCollectionController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.json.JsonCompareMode;
@@ -14,6 +16,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 @ActiveProfiles("itest")
 @SpringBootTest(webEnvironment = RANDOM_PORT)
+@AutoConfigureWebTestClient(timeout = "36000")
 public class MythCollectionIT {
 
   @Autowired private WebTestClient webTestClient;
@@ -24,6 +27,27 @@ public class MythCollectionIT {
     String response = loadPayload("it/createNewFigurine/response.json");
 
     final String uri = MythCollectionController.MAPPING;
+
+    webTestClient
+        .post()
+        .uri(uri)
+        .contentType(APPLICATION_JSON)
+        .bodyValue(request)
+        .exchange()
+        .expectStatus()
+        .isCreated()
+        .expectHeader()
+        .contentType(APPLICATION_JSON)
+        .expectBody()
+        .json(response, JsonCompareMode.LENIENT);
+  }
+
+  @Test
+  void execute_createNewDistributor() {
+    String request = loadPayload("it/createNewDistributor/request.json");
+    String response = loadPayload("it/createNewDistributor/response.json");
+
+    final String uri = DistributorController.MAPPING;
 
     webTestClient
         .post()
