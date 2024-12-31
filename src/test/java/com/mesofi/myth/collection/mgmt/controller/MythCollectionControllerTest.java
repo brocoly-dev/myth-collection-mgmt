@@ -123,6 +123,26 @@ public class MythCollectionControllerTest {
   }
 
   @Test
+  void createFigurine_whenDistributionJPYEmpty_thenReturnBadRequest() throws Exception {
+    String payload = loadPayload("figurines/distributionJPY_empty_field.json");
+
+    mockMvc
+        .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
+        .andDo(print())
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("Bad Request"))
+        .andExpect(jsonPath("$.messages").isArray())
+        .andExpect(jsonPath("$.messages", hasSize(3)))
+        .andExpect(
+            jsonPath("$.messages").value(hasItem("distributionJPY.basePrice: must not be null")))
+        .andExpect(
+            jsonPath("$.messages").value(hasItem("distributionJPY.preOrderDate: must not be null")))
+        .andExpect(
+            jsonPath("$.messages").value(hasItem("distributionJPY.releaseDate: must not be null")))
+        .andExpect(jsonPath("$.path").value(PATH));
+  }
+
+  @Test
   void createFigurine_whenTamashiiUrlTooLong_thenReturnBadRequest() throws Exception {
     String payload = loadPayload("figurines/tamashiiUrl_tooLong_field.json");
 
