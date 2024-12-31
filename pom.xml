@@ -30,6 +30,7 @@
         <java.version>21</java.version>
         <de.flapdoodle.embed.mongo.spring30x>4.11.0</de.flapdoodle.embed.mongo.spring30x>
         <spotless-maven-plugin.version>2.43.0</spotless-maven-plugin.version>
+        <pitest-threshold.value>95</pitest-threshold.value>
     </properties>
     <dependencies>
         <dependency>
@@ -140,6 +141,57 @@
                         </googleJavaFormat>
                     </java>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>1.17.3</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-junit5-plugin</artifactId>
+                        <version>1.2.1</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <outputFormats>
+                        <param>HTML</param>
+                        <param>XML</param>
+                    </outputFormats>
+                    <!-- omitting mutators, testPlugin and verbose for brevity -->
+                    <exportLineCoverage>true</exportLineCoverage>
+                    <!--
+                    it's currently not possible to aggregate timestamped
+                    reports, so it must be disabled.
+                    -->
+                    <timestampedReports>false</timestampedReports>
+                    <mutationThreshold>${pitest-threshold.value}</mutationThreshold>
+                    <testStrengthThreshold>${pitest-threshold.value}</testStrengthThreshold>
+                    <excludedClasses>
+                        <param>az.marketing.communication.optsync.*Config</param>
+                    </excludedClasses>
+                    <!--
+                    <excludedTestClasses>
+                        <param>com.mesofi.myth.collection.**.*IT</param>
+                    </excludedTestClasses>
+                    -->
+                </configuration>
+                <executions>
+                    <execution>
+                        <!--
+                        Use an id to disable it in some submodules
+                        -->
+                        <id>pitest-mutation-coverage</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>mutationCoverage</goal>
+                        </goals>
+                    </execution>
+                    <!--
+                    NO report-aggregate here. Most of the time you don't
+                    want it to run.
+                    -->
+                </executions>
             </plugin>
         </plugins>
     </build>

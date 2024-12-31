@@ -19,7 +19,7 @@ public class TestUtils {
   public static <T> T fromJsonToObject(Class<T> clazz, String jsonString) {
     try {
       ObjectMapper mapper = new ObjectMapper();
-      return (T) mapper.readValue(jsonString, clazz);
+      return mapper.readValue(jsonString, clazz);
     } catch (Exception e) {
       e.printStackTrace();
       return null;

@@ -37,7 +37,7 @@ public class MythCollectionControllerTest {
 
   @Test
   void createFigurine_whenInvalidPath_thenReturnNotFound() throws Exception {
-    String payload = loadPayload("missing_payload.json");
+    String payload = loadPayload("figurines/missing_payload.json");
 
     mockMvc
         .perform(post("/invalid-path").contentType(APPLICATION_JSON).content(payload))
@@ -56,7 +56,7 @@ public class MythCollectionControllerTest {
 
   @Test
   void createFigurine_whenMissingBody_thenReturnBadRequest() throws Exception {
-    String payload = loadPayload("missing_payload.json");
+    String payload = loadPayload("figurines/missing_payload.json");
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
@@ -73,7 +73,7 @@ public class MythCollectionControllerTest {
 
   @Test
   void createFigurine_whenEmptyBody_thenReturnBadRequest() throws Exception {
-    String payload = loadPayload("empty_payload.json");
+    String payload = loadPayload("figurines/empty_payload.json");
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
@@ -90,7 +90,7 @@ public class MythCollectionControllerTest {
 
   @Test
   void createFigurine_whenBaseNameTooShort_thenReturnBadRequest() throws Exception {
-    String payload = loadPayload("baseName_tooShort_field.json");
+    String payload = loadPayload("figurines/baseName_tooShort_field.json");
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
@@ -107,7 +107,7 @@ public class MythCollectionControllerTest {
 
   @Test
   void createFigurine_whenBaseNameTooLong_thenReturnBadRequest() throws Exception {
-    String payload = loadPayload("baseName_tooLong_field.json");
+    String payload = loadPayload("figurines/baseName_tooLong_field.json");
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
@@ -124,7 +124,7 @@ public class MythCollectionControllerTest {
 
   @Test
   void createFigurine_whenTamashiiUrlTooLong_thenReturnBadRequest() throws Exception {
-    String payload = loadPayload("tamashiiUrl_tooLong_field.json");
+    String payload = loadPayload("figurines/tamashiiUrl_tooLong_field.json");
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
@@ -142,7 +142,7 @@ public class MythCollectionControllerTest {
 
   @Test
   void createFigurine_whenSucessPayload_thenReturnCreated() throws Exception {
-    String payload = loadPayload("success_payload.json");
+    String payload = loadPayload("figurines/success_payload.json");
 
     Figurine newFigurine = fromJsonToObject(Figurine.class, payload);
 

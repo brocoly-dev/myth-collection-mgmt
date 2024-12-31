@@ -1,6 +1,6 @@
 package com.mesofi.myth.collection.mgmt.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.mesofi.myth.collection.mgmt.model.Figurine;
 import org.junit.jupiter.api.Test;
@@ -19,6 +19,6 @@ public class MythCollectionRepositoryTest {
     Figurine figurineToSave = new Figurine(null, "Seiya", "https://tamashiiweb.com/item/000");
     Figurine savedFigurine = repository.save(figurineToSave);
 
-    assertThat(repository.findById(savedFigurine.id())).isPresent();
+    assertTrue(repository.findById(savedFigurine.id()).isPresent());
   }
 }

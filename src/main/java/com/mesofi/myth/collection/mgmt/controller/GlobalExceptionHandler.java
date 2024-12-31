@@ -1,16 +1,16 @@
 package com.mesofi.myth.collection.mgmt.controller;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+import com.mesofi.myth.collection.mgmt.exceptions.CatalogItemNotFoundException;
+import com.mesofi.myth.collection.mgmt.model.ErrorDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -55,15 +55,24 @@ public class GlobalExceptionHandler {
   }
 
   // Handle unsupported HTTP methods (405 error)
-  @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-  @ResponseStatus(METHOD_NOT_ALLOWED)
-  public ResponseEntity<ErrorDetails> handleHttpRequestMethodNotSupported(
-      HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
+  //  @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+  //  @ResponseStatus(METHOD_NOT_ALLOWED)
+  //  public ResponseEntity<ErrorDetails> handleHttpRequestMethodNotSupported(
+  //      HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
+  //
+  //    return createErrorDetails(
+  //        METHOD_NOT_ALLOWED,
+  //        "The requested HTTP method is not supported for this endpoint.",
+  //        request);
+  //  }
 
+  // Handle the case where no resource is found for a URL (404 error)
+  @ExceptionHandler(CatalogItemNotFoundException.class)
+  @ResponseStatus(NOT_FOUND)
+  public ResponseEntity<ErrorDetails> handleHttpRequestCatalogItemNotFound(
+      CatalogItemNotFoundException ex, HttpServletRequest request) {
     return createErrorDetails(
-        METHOD_NOT_ALLOWED,
-        "The requested HTTP method is not supported for this endpoint.",
-        request);
+        NOT_FOUND, "The catalog for the given identifier was not found.", request);
   }
 
   private ResponseEntity<ErrorDetails> createErrorDetails(
