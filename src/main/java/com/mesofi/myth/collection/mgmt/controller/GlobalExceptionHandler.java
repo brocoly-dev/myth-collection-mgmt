@@ -4,6 +4,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+import com.mesofi.myth.collection.mgmt.exceptions.CatalogItemNotFoundException;
 import com.mesofi.myth.collection.mgmt.model.ErrorDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -65,6 +66,15 @@ public class GlobalExceptionHandler {
         METHOD_NOT_ALLOWED,
         "The requested HTTP method is not supported for this endpoint.",
         request);
+  }
+
+  // Handle the case where no resource is found for a URL (404 error)
+  @ExceptionHandler(CatalogItemNotFoundException.class)
+  @ResponseStatus(NOT_FOUND)
+  public ResponseEntity<ErrorDetails> handleHttpRequestCatalogItemNotFound(
+      CatalogItemNotFoundException ex, HttpServletRequest request) {
+    return createErrorDetails(
+        NOT_FOUND, "The catalog for the given identifier was not found.", request);
   }
 
   private ResponseEntity<ErrorDetails> createErrorDetails(
