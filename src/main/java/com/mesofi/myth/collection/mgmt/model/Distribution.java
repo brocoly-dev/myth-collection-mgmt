@@ -1,6 +1,7 @@
 package com.mesofi.myth.collection.mgmt.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,7 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Distribution {
-  private Distributor distributor;
+  @Valid private Distributor distributor;
   @NotNull private BigDecimal basePrice;
   private BigDecimal finalPrice;
   private LocalDate firstAnnouncementDate;

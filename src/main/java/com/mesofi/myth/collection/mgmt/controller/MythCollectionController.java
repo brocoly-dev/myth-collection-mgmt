@@ -23,7 +23,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RestController
 @AllArgsConstructor
 @RequestMapping(MythCollectionController.MAPPING)
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class MythCollectionController {
 
   public static final String MAPPING = "/figurines";

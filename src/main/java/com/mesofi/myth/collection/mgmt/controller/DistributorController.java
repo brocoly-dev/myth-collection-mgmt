@@ -28,7 +28,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RestController
 @AllArgsConstructor
 @RequestMapping(DistributorController.MAPPING)
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class DistributorController {
 
   public static final String MAPPING = "/distributors";

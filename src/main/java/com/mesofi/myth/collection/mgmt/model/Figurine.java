@@ -1,6 +1,7 @@
 package com.mesofi.myth.collection.mgmt.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -25,8 +26,8 @@ public class Figurine {
   @Size(min = 3, max = 20)
   private String baseName;
 
-  private Distribution distributionJPY;
-  private Distribution distributionMXN;
+  @Valid private Distribution distributionJPY;
+  @Valid private Distribution distributionMXN;
 
   @Size(max = 35)
   String tamashiiUrl;
