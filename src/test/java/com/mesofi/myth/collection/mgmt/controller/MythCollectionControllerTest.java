@@ -123,6 +123,80 @@ public class MythCollectionControllerTest {
   }
 
   @Test
+  void createFigurine_whenDistributionJPYEmpty_thenReturnBadRequest() throws Exception {
+    String payload = loadPayload("figurines/distributionJPY_empty_field.json");
+
+    mockMvc
+        .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
+        .andDo(print())
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("Bad Request"))
+        .andExpect(jsonPath("$.messages").isArray())
+        .andExpect(jsonPath("$.messages", hasSize(3)))
+        .andExpect(
+            jsonPath("$.messages").value(hasItem("distributionJPY.basePrice: must not be null")))
+        .andExpect(
+            jsonPath("$.messages").value(hasItem("distributionJPY.preOrderDate: must not be null")))
+        .andExpect(
+            jsonPath("$.messages").value(hasItem("distributionJPY.releaseDate: must not be null")))
+        .andExpect(jsonPath("$.path").value(PATH));
+  }
+
+  @Test
+  void createFigurine_whenDistributionJPYBasePricePopulated_thenReturnBadRequest()
+      throws Exception {
+    String payload = loadPayload("figurines/distributionJPY_basePrice_populated_field.json");
+
+    mockMvc
+        .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
+        .andDo(print())
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("Bad Request"))
+        .andExpect(jsonPath("$.messages").isArray())
+        .andExpect(jsonPath("$.messages", hasSize(2)))
+        .andExpect(
+            jsonPath("$.messages").value(hasItem("distributionJPY.preOrderDate: must not be null")))
+        .andExpect(
+            jsonPath("$.messages").value(hasItem("distributionJPY.releaseDate: must not be null")))
+        .andExpect(jsonPath("$.path").value(PATH));
+  }
+
+  @Test
+  void createFigurine_whenDistributionJPYBasePricePreOrderDatePopulated_thenReturnBadRequest()
+      throws Exception {
+    String payload =
+        loadPayload("figurines/distributionJPY_basePrice_preOrderDate_populated_field.json");
+
+    mockMvc
+        .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
+        .andDo(print())
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("Bad Request"))
+        .andExpect(jsonPath("$.messages").isArray())
+        .andExpect(jsonPath("$.messages", hasSize(1)))
+        .andExpect(
+            jsonPath("$.messages").value(hasItem("distributionJPY.releaseDate: must not be null")))
+        .andExpect(jsonPath("$.path").value(PATH));
+  }
+
+  @Test
+  void createFigurine_whenDistributionJPYDistributorEmpty_thenReturnBadRequest() throws Exception {
+    String payload = loadPayload("figurines/distributionJPY_distributor_empty_field.json");
+
+    mockMvc
+        .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
+        .andDo(print())
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("Bad Request"))
+        .andExpect(jsonPath("$.messages").isArray())
+        .andExpect(jsonPath("$.messages", hasSize(1)))
+        .andExpect(
+            jsonPath("$.messages")
+                .value(hasItem("distributionJPY.distributor.name: must not be blank")))
+        .andExpect(jsonPath("$.path").value(PATH));
+  }
+
+  @Test
   void createFigurine_whenTamashiiUrlTooLong_thenReturnBadRequest() throws Exception {
     String payload = loadPayload("figurines/tamashiiUrl_tooLong_field.json");
 
@@ -141,14 +215,19 @@ public class MythCollectionControllerTest {
   }
 
   @Test
-  void createFigurine_whenSucessPayload_thenReturnCreated() throws Exception {
+  void createFigurine_whenSuccessPayload_thenReturnCreated() throws Exception {
     String payload = loadPayload("figurines/success_payload.json");
 
     Figurine newFigurine = fromJsonToObject(Figurine.class, payload);
 
     when(service.createFigurine(newFigurine))
         .thenReturn(
-            new Figurine("1", newFigurine.getBaseName(), null, null, newFigurine.getTamashiiUrl()));
+            new Figurine(
+                "1",
+                newFigurine.getBaseName(),
+                newFigurine.getDistributionJPY(),
+                newFigurine.getDistributionMXN(),
+                newFigurine.getTamashiiUrl()));
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
@@ -157,6 +236,14 @@ public class MythCollectionControllerTest {
         .andExpect(header().string("Location", "http://localhost/figurines/1"))
         .andExpect(jsonPath("$.id").value("1"))
         .andExpect(jsonPath("$.baseName").value("Seiya"))
+        .andExpect(jsonPath("$.distributionJPY.basePrice").value("4500"))
+        .andExpect(jsonPath("$.distributionJPY.preOrderDate").value("2024-10-02"))
+        .andExpect(jsonPath("$.distributionJPY.releaseDate").value("2024-10-02"))
+        .andExpect(jsonPath("$.distributionMXN.distributor.id").value("1234567890"))
+        .andExpect(jsonPath("$.distributionMXN.distributor.name").value("DAM"))
+        .andExpect(jsonPath("$.distributionMXN.basePrice").value("3500"))
+        .andExpect(jsonPath("$.distributionMXN.preOrderDate").value("2025-10-02"))
+        .andExpect(jsonPath("$.distributionMXN.releaseDate").value("2025-10-02"))
         .andExpect(jsonPath("$.tamashiiUrl").value("https://tamashiiweb.com/item/000"));
 
     verify(service, times(1)).createFigurine(newFigurine);

@@ -1,4 +1,18 @@
 {
   "baseName": "Seiya",
+  "distributionJPY": {
+    "basePrice": "4500",
+    "preOrderDate": "2024-10-02",
+    "releaseDate": "2024-10-02"
+  },
+  "distributionMXN": {
+    "distributor": {
+      "id": "1234567890",
+      "name": "DAM"
+    },
+    "basePrice": "3500",
+    "preOrderDate": "2025-10-02",
+    "releaseDate": "2025-10-02"
+  },
   "tamashiiUrl": "https://tamashiiweb.com/item/000"
 }
