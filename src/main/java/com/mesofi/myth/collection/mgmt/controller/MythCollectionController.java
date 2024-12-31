@@ -38,7 +38,8 @@ public class MythCollectionController {
 
     // Build the URI for the newly created resource
     String pathLocation = MAPPING + "/{id}";
-    String location = urBuilder.path(pathLocation).buildAndExpand(newFigurine.id()).toUriString();
+    String location =
+        urBuilder.path(pathLocation).buildAndExpand(newFigurine.getId()).toUriString();
 
     // Return 201 Created with Location header and the created figurine
     return ResponseEntity.created(URI.create(location)).body(newFigurine);

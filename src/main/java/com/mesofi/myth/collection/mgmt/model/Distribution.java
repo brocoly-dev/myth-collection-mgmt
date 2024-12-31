@@ -1,16 +1,24 @@
 package com.mesofi.myth.collection.mgmt.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Distribution {
-  private BigDecimal basePrice;
+  private Distributor distributor;
+  @NotNull private BigDecimal basePrice;
   private BigDecimal finalPrice;
   private LocalDate firstAnnouncementDate;
-  private LocalDate preOrderDate;
-  private LocalDate releaseDate;
+  @NotNull private LocalDate preOrderDate;
+  @NotNull private LocalDate releaseDate;
 }

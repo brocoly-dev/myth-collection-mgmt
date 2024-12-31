@@ -147,7 +147,8 @@ public class MythCollectionControllerTest {
     Figurine newFigurine = fromJsonToObject(Figurine.class, payload);
 
     when(service.createFigurine(newFigurine))
-        .thenReturn(new Figurine("1", newFigurine.baseName(), newFigurine.tamashiiUrl()));
+        .thenReturn(
+            new Figurine("1", newFigurine.getBaseName(), null, null, newFigurine.getTamashiiUrl()));
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))

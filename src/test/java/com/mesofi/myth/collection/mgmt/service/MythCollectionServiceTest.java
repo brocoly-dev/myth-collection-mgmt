@@ -24,8 +24,10 @@ public class MythCollectionServiceTest {
   void createFigurine_whenFigurinePopulated_thenCreateFigurineAndReturnSaved() {
 
     // Arrange
-    Figurine figurineToSave = new Figurine(null, "Seiya", "https://tamashiiweb.com/item/000");
-    Figurine savedFigurine = new Figurine("1", "Seiya", "https://tamashiiweb.com/item/000");
+    Figurine figurineToSave =
+        new Figurine(null, "Seiya", null, null, "https://tamashiiweb.com/item/000");
+    Figurine savedFigurine =
+        new Figurine("1", "Seiya", null, null, "https://tamashiiweb.com/item/000");
     when(repository.save(figurineToSave)).thenReturn(savedFigurine);
 
     // Act
@@ -33,9 +35,9 @@ public class MythCollectionServiceTest {
 
     // Assert
     assertNotNull(result);
-    assertEquals("1", result.id());
-    assertEquals("Seiya", result.baseName());
-    assertEquals("https://tamashiiweb.com/item/000", result.tamashiiUrl());
+    assertEquals("1", result.getId());
+    assertEquals("Seiya", result.getBaseName());
+    assertEquals("https://tamashiiweb.com/item/000", result.getTamashiiUrl());
     verify(repository, times(1)).save(figurineToSave);
   }
 }

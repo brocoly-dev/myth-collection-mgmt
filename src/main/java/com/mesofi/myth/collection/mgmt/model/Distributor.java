@@ -1,5 +1,6 @@
 package com.mesofi.myth.collection.mgmt.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "distributors")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Distributor {
   @Id private String id;
   private @NotBlank @Size(min = 3, max = 20) String name;
