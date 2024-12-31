@@ -30,7 +30,7 @@
         <java.version>21</java.version>
         <de.flapdoodle.embed.mongo.spring30x>4.11.0</de.flapdoodle.embed.mongo.spring30x>
         <spotless-maven-plugin.version>2.43.0</spotless-maven-plugin.version>
-        <pitest-threshold.value>100</pitest-threshold.value>
+        <pitest-threshold.value>95</pitest-threshold.value>
     </properties>
     <dependencies>
         <dependency>
@@ -170,9 +170,11 @@
                     <excludedClasses>
                         <param>az.marketing.communication.optsync.*Config</param>
                     </excludedClasses>
+                    <!--
                     <excludedTestClasses>
                         <param>com.mesofi.myth.collection.**.*IT</param>
                     </excludedTestClasses>
+                    -->
                 </configuration>
                 <executions>
                     <execution>

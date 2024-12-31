@@ -115,9 +115,10 @@ public class DistributorServiceTest {
   void updateDistributor_whenDistributorFound_thenReturnUpdatedDistributor() {
 
     // Arrange
-    Distributor existingDistributor = new Distributor("1", "D");
+    Distributor distributorToUpdate = new Distributor("1", "DTM");
+    Distributor existingDistributor = new Distributor("1", "DTM");
     when(repository.existsById("1")).thenReturn(true);
-    when(repository.save(existingDistributor)).thenReturn(existingDistributor);
+    when(repository.save(distributorToUpdate)).thenReturn(existingDistributor);
 
     // Act
     Distributor result = service.updateDistributor("1", existingDistributor);
@@ -125,7 +126,9 @@ public class DistributorServiceTest {
     // Assert
     assertNotNull(result);
     assertEquals("1", result.getId());
-    assertEquals("D", result.getName());
+    assertEquals("DTM", result.getName());
+    assertEquals("1", existingDistributor.getId());
+    assertEquals("1", distributorToUpdate.getId());
 
     // Verify
     verify(repository).existsById("1");

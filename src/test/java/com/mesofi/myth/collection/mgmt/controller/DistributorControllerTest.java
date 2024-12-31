@@ -5,12 +5,15 @@ import static com.mesofi.myth.collection.mgmt.common.TestUtils.loadPayload;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -202,5 +205,64 @@ public class DistributorControllerTest {
         .andExpect(jsonPath("$.name").value("DTM"));
 
     verify(service, times(1)).getDistributorById(id);
+  }
+
+  @Test
+  void updateDistributor_whenDistributorIdInvalid_thenReturnNotFound() throws Exception {
+    String payload = loadPayload("distributors/success_payload.json");
+    String invalidId = "some-invalid-id";
+
+    Distributor existingDistributor = fromJsonToObject(Distributor.class, payload);
+
+    when(service.updateDistributor(invalidId, existingDistributor))
+        .thenThrow(CatalogItemNotFoundException.class);
+
+    mockMvc
+        .perform(
+            put(PATH + "/{invalidId}", invalidId).contentType(APPLICATION_JSON).content(payload))
+        .andDo(print())
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.error").value("Not Found"))
+        .andExpect(jsonPath("$.messages").isArray())
+        .andExpect(jsonPath("$.messages", hasSize(1)))
+        .andExpect(
+            jsonPath("$.messages")
+                .value(hasItem("The catalog for the given identifier was not found.")))
+        .andExpect(jsonPath("$.path").value("/distributors/some-invalid-id"));
+
+    verify(service, times(1)).updateDistributor(invalidId, existingDistributor);
+  }
+
+  @Test
+  void updateDistributor_whenDistributorIdValid_thenReturnUpdatedDistributor() throws Exception {
+    String payload = loadPayload("distributors/success_payload.json");
+    String id = "1";
+
+    Distributor existingDistributor = fromJsonToObject(Distributor.class, payload);
+
+    when(service.updateDistributor(id, existingDistributor)).thenReturn(new Distributor(id, "DTM"));
+
+    mockMvc
+        .perform(put(PATH + "/{id}", id).contentType(APPLICATION_JSON).content(payload))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value("1"))
+        .andExpect(jsonPath("$.name").value("DTM"));
+
+    verify(service, times(1)).updateDistributor(id, existingDistributor);
+  }
+
+  @Test
+  void deleteDistributor_whenDistributorIdValid_thenReturnNoContent() throws Exception {
+    String id = "1";
+
+    doNothing().when(service).deleteDistributor(id);
+
+    mockMvc
+        .perform(delete(PATH + "/{id}", id).contentType(APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isNoContent());
+
+    verify(service, times(1)).deleteDistributor(id);
   }
 }
