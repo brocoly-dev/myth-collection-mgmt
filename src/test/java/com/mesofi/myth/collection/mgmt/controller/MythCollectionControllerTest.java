@@ -143,6 +143,25 @@ public class MythCollectionControllerTest {
   }
 
   @Test
+  void createFigurine_whenDistributionJPYBasePriceInvalid_thenReturnBadRequest() throws Exception {
+    String payload = loadPayload("figurines/distributionJPY_basePrice_invalid_field.json");
+
+    mockMvc
+        .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
+        .andDo(print())
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("Bad Request"))
+        .andExpect(jsonPath("$.messages").isArray())
+        .andExpect(jsonPath("$.messages", hasSize(1)))
+        .andExpect(jsonPath("$.messages").value(hasItem("The required request body is missing.")))
+        .andExpect(
+            jsonPath("$.detailMessage")
+                .value(
+                    "JSON parse error: Cannot deserialize value of type `java.math.BigDecimal` from String \"x4500\": not a valid representation"))
+        .andExpect(jsonPath("$.path").value(PATH));
+  }
+
+  @Test
   void createFigurine_whenDistributionJPYBasePricePopulated_thenReturnBadRequest()
       throws Exception {
     String payload = loadPayload("figurines/distributionJPY_basePrice_populated_field.json");

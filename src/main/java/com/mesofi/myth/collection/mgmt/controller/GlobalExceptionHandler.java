@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
             .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
             .toArray(String[]::new);
 
-    return createErrorDetails(BAD_REQUEST, errorMessages, request);
+    return createErrorDetails(BAD_REQUEST, errorMessages, null, request);
   }
 
   // Handle the case where the message cannot be readable (400 error)
@@ -41,7 +41,8 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorDetails> handleMessageNotReadableException(
       HttpMessageNotReadableException ex, HttpServletRequest request) {
 
-    return createErrorDetails(BAD_REQUEST, "The required request body is missing.", request);
+    return createErrorDetails(
+        BAD_REQUEST, "The required request body is missing.", ex.getMessage(), request);
   }
 
   // Handle the case where no resource is found for a URL (404 error)
@@ -51,7 +52,7 @@ public class GlobalExceptionHandler {
       NoResourceFoundException ex, HttpServletRequest request) {
 
     return createErrorDetails(
-        NOT_FOUND, "The requested URL was not found on this server.", request);
+        NOT_FOUND, "The requested URL was not found on this server.", null, request);
   }
 
   // Handle unsupported HTTP methods (405 error)
@@ -72,20 +73,21 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorDetails> handleHttpRequestCatalogItemNotFound(
       CatalogItemNotFoundException ex, HttpServletRequest request) {
     return createErrorDetails(
-        NOT_FOUND, "The catalog for the given identifier was not found.", request);
+        NOT_FOUND, "The catalog for the given identifier was not found.", null, request);
   }
 
   private ResponseEntity<ErrorDetails> createErrorDetails(
-      HttpStatus httpStatus, String message, HttpServletRequest request) {
+      HttpStatus httpStatus, String messages, String detailMessage, HttpServletRequest request) {
 
-    return createErrorDetails(httpStatus, new String[] {message}, request);
+    return createErrorDetails(httpStatus, new String[] {messages}, detailMessage, request);
   }
 
   private ResponseEntity<ErrorDetails> createErrorDetails(
-      HttpStatus httpStatus, String[] message, HttpServletRequest request) {
+      HttpStatus httpStatus, String[] messages, String detailMessage, HttpServletRequest request) {
 
     ErrorDetails resp =
-        new ErrorDetails(httpStatus.getReasonPhrase(), message, request.getRequestURI());
+        new ErrorDetails(
+            httpStatus.getReasonPhrase(), messages, detailMessage, request.getRequestURI());
     return new ResponseEntity<>(resp, httpStatus);
   }
 }
