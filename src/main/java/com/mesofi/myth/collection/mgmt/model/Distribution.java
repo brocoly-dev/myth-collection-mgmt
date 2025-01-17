@@ -24,4 +24,5 @@ public class Distribution {
   private LocalDate firstAnnouncementDate;
   @NotNull private LocalDate preOrderDate;
   @NotNull private LocalDate releaseDate;
+  @NotNull private Boolean releaseDateConfirmed;
 }
