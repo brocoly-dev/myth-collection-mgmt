@@ -25,9 +25,9 @@ public class MythCollectionServiceTest {
 
     // Arrange
     Figurine figurineToSave =
-        new Figurine(null, "Seiya", null, null, "https://tamashiiweb.com/item/000");
+        new Figurine(null, "Seiya", null, null, "https://tamashiiweb.com/item/000", null);
     Figurine savedFigurine =
-        new Figurine("1", "Seiya", null, null, "https://tamashiiweb.com/item/000");
+        new Figurine("1", "Seiya", null, null, "https://tamashiiweb.com/item/000", null);
     when(repository.save(figurineToSave)).thenReturn(savedFigurine);
 
     // Act

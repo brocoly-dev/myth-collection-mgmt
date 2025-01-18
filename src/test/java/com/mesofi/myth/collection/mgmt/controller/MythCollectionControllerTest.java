@@ -349,7 +349,8 @@ public class MythCollectionControllerTest {
                 newFigurine.getBaseName(),
                 newFigurine.getDistributionJPY(),
                 newFigurine.getDistributionMXN(),
-                newFigurine.getTamashiiUrl()));
+                newFigurine.getTamashiiUrl(),
+                newFigurine.getDistributionChannel()));
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))

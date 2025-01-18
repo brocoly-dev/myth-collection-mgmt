@@ -20,8 +20,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.mesofi.myth.collection.mgmt.exceptions.CatalogItemNotFoundException;
-import com.mesofi.myth.collection.mgmt.model.Distributor;
-import com.mesofi.myth.collection.mgmt.service.DistributorService;
+import com.mesofi.myth.collection.mgmt.model.DistributionChannel;
+import com.mesofi.myth.collection.mgmt.service.DistributionChannelService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,18 +32,18 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(DistributorController.class)
-public class DistributorControllerTest {
+@WebMvcTest(DistributionChannelController.class)
+public class DistributionChannelControllerTest {
 
   @Autowired private MockMvc mockMvc; // MockMvc is used to simulate HTTP requests
 
-  @MockitoBean private DistributorService service; // Mock the service layer
+  @MockitoBean private DistributionChannelService service; // Mock the service layer
 
-  private final String PATH = "/distributors";
+  private final String PATH = "/distribution-channels";
 
   @Test
-  void createDistributor_whenInvalidPath_thenReturnNotFound() throws Exception {
-    String payload = loadPayload("distributors/payload_missing.json");
+  void createDistributionChannel_whenInvalidPath_thenReturnNotFound() throws Exception {
+    String payload = loadPayload("distribution-channels/payload_missing.json");
 
     mockMvc
         .perform(post("/invalid-path").contentType(APPLICATION_JSON).content(payload))
@@ -57,12 +57,12 @@ public class DistributorControllerTest {
                 .value(hasItem("The requested URL was not found on this server.")))
         .andExpect(jsonPath("$.path").value("/invalid-path"));
 
-    verify(service, times(0)).createDistributor(any(Distributor.class));
+    verify(service, times(0)).createDistributionChannel(any(DistributionChannel.class));
   }
 
   @Test
-  void createDistributor_whenMissingBody_thenReturnBadRequest() throws Exception {
-    String payload = loadPayload("distributors/payload_missing.json");
+  void createDistributionChannel_whenMissingBody_thenReturnBadRequest() throws Exception {
+    String payload = loadPayload("distribution-channels/payload_missing.json");
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
@@ -74,12 +74,12 @@ public class DistributorControllerTest {
         .andExpect(jsonPath("$.messages").value(hasItem("The required request body is missing.")))
         .andExpect(jsonPath("$.path").value(PATH));
 
-    verify(service, times(0)).createDistributor(any(Distributor.class));
+    verify(service, times(0)).createDistributionChannel(any(DistributionChannel.class));
   }
 
   @Test
-  void createDistributor_whenEmptyBody_thenReturnBadRequest() throws Exception {
-    String payload = loadPayload("distributors/payload_empty.json");
+  void createDistributionChannel_whenEmptyBody_thenReturnBadRequest() throws Exception {
+    String payload = loadPayload("distribution-channels/payload_empty.json");
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
@@ -88,15 +88,15 @@ public class DistributorControllerTest {
         .andExpect(jsonPath("$.error").value("Bad Request"))
         .andExpect(jsonPath("$.messages").isArray())
         .andExpect(jsonPath("$.messages", hasSize(1)))
-        .andExpect(jsonPath("$.messages").value(hasItem("name: must not be blank")))
+        .andExpect(jsonPath("$.messages").value(hasItem("distribution: must not be blank")))
         .andExpect(jsonPath("$.path").value(PATH));
 
-    verify(service, times(0)).createDistributor(any(Distributor.class));
+    verify(service, times(0)).createDistributionChannel(any(DistributionChannel.class));
   }
 
   @Test
-  void createDistributor_whenNameTooShort_thenReturnBadRequest() throws Exception {
-    String payload = loadPayload("distributors/name_tooShort.json");
+  void createDistributionChannel_whenNameTooShort_thenReturnBadRequest() throws Exception {
+    String payload = loadPayload("distribution-channels/distribution_tooShort.json");
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
@@ -105,15 +105,16 @@ public class DistributorControllerTest {
         .andExpect(jsonPath("$.error").value("Bad Request"))
         .andExpect(jsonPath("$.messages").isArray())
         .andExpect(jsonPath("$.messages", hasSize(1)))
-        .andExpect(jsonPath("$.messages").value(hasItem("name: size must be between 3 and 20")))
+        .andExpect(
+            jsonPath("$.messages").value(hasItem("distribution: size must be between 5 and 30")))
         .andExpect(jsonPath("$.path").value(PATH));
 
-    verify(service, times(0)).createDistributor(any(Distributor.class));
+    verify(service, times(0)).createDistributionChannel(any(DistributionChannel.class));
   }
 
   @Test
-  void createDistributor_whenNameTooLong_thenReturnBadRequest() throws Exception {
-    String payload = loadPayload("distributors/name_tooLong.json");
+  void createDistributionChannel_whenNameTooLong_thenReturnBadRequest() throws Exception {
+    String payload = loadPayload("distribution-channels/distribution_tooLong.json");
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
@@ -122,37 +123,41 @@ public class DistributorControllerTest {
         .andExpect(jsonPath("$.error").value("Bad Request"))
         .andExpect(jsonPath("$.messages").isArray())
         .andExpect(jsonPath("$.messages", hasSize(1)))
-        .andExpect(jsonPath("$.messages").value(hasItem("name: size must be between 3 and 20")))
+        .andExpect(
+            jsonPath("$.messages").value(hasItem("distribution: size must be between 5 and 30")))
         .andExpect(jsonPath("$.path").value(PATH));
 
-    verify(service, times(0)).createDistributor(any(Distributor.class));
+    verify(service, times(0)).createDistributionChannel(any(DistributionChannel.class));
   }
 
   @Test
-  void createDistributor_whenSucessPayload_thenReturnCreated() throws Exception {
-    String payload = loadPayload("distributors/payload_success.json");
+  void createDistributionChannel_whenSucessPayload_thenReturnCreated() throws Exception {
+    String payload = loadPayload("distribution-channels/payload_success.json");
 
-    Distributor newDistributor = fromJsonToObject(Distributor.class, payload);
+    DistributionChannel newDistributionChannel =
+        fromJsonToObject(DistributionChannel.class, payload);
 
-    when(service.createDistributor(newDistributor))
-        .thenReturn(new Distributor("1", newDistributor.getName()));
+    when(service.createDistributionChannel(newDistributionChannel))
+        .thenReturn(new DistributionChannel("1", newDistributionChannel.getDistribution()));
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
         .andDo(print())
         .andExpect(status().isCreated())
-        .andExpect(header().string("Location", "http://localhost/distributors/1"))
+        .andExpect(header().string("Location", "http://localhost/distribution-channels/1"))
         .andExpect(jsonPath("$.id").value("1"))
-        .andExpect(jsonPath("$.name").value("DTM"));
+        .andExpect(jsonPath("$.distribution").value("Stores"));
 
-    verify(service, times(1)).createDistributor(newDistributor);
+    verify(service, times(1)).createDistributionChannel(newDistributionChannel);
   }
 
   @Test
-  void getAllDistributors_whenDistributorsPopulated_thenReturnAllDistributors() throws Exception {
+  void getAllDistributionChannel_whenDistributionChannelPopulated_thenReturnAllDistributionChannel()
+      throws Exception {
 
-    when(service.getAllDistributors())
-        .thenReturn(List.of(new Distributor("1", "DAM"), new Distributor("2", "DTM")));
+    when(service.getAllDistributionChannels())
+        .thenReturn(
+            List.of(new DistributionChannel("1", "Stores"), new DistributionChannel("2", "Web")));
 
     mockMvc
         .perform(get(PATH).contentType(APPLICATION_JSON))
@@ -161,19 +166,21 @@ public class DistributorControllerTest {
         .andExpect(jsonPath("$").isArray())
         .andExpect(jsonPath("$", hasSize(2)))
         .andExpect(jsonPath("$[0].id").value("1"))
-        .andExpect(jsonPath("$[0].name").value("DAM"))
+        .andExpect(jsonPath("$[0].distribution").value("Stores"))
         .andExpect(jsonPath("$[1].id").value("2"))
-        .andExpect(jsonPath("$[1].name").value("DTM"));
+        .andExpect(jsonPath("$[1].distribution").value("Web"));
 
-    verify(service, times(1)).getAllDistributors();
+    verify(service, times(1)).getAllDistributionChannels();
   }
 
   @Test
-  void getDistributorById_whenDistributorIdInvalid_thenReturnNotFound() throws Exception {
+  void getDistributionChannelById_whenDistributionChannelIdInvalid_thenReturnNotFound()
+      throws Exception {
 
     String invalidId = "some-invalid-id";
 
-    when(service.getDistributorById(invalidId)).thenThrow(CatalogItemNotFoundException.class);
+    when(service.getDistributionChannelById(invalidId))
+        .thenThrow(CatalogItemNotFoundException.class);
 
     mockMvc
         .perform(get(PATH + "/{invalidId}", invalidId).contentType(APPLICATION_JSON))
@@ -185,36 +192,39 @@ public class DistributorControllerTest {
         .andExpect(
             jsonPath("$.messages")
                 .value(hasItem("The catalog for the given identifier was not found.")))
-        .andExpect(jsonPath("$.path").value("/distributors/some-invalid-id"));
+        .andExpect(jsonPath("$.path").value("/distribution-channels/some-invalid-id"));
 
-    verify(service, times(1)).getDistributorById(invalidId);
+    verify(service, times(1)).getDistributionChannelById(invalidId);
   }
 
   @Test
-  void getDistributorById_whenDistributorIdValid_thenReturnDistributor() throws Exception {
+  void getDistributionChannelById_whenDistributionChannelIdValid_thenReturnDistributionChannel()
+      throws Exception {
 
     String id = "1";
 
-    when(service.getDistributorById(id)).thenReturn(new Distributor(id, "DTM"));
+    when(service.getDistributionChannelById(id)).thenReturn(new DistributionChannel(id, "Stores"));
 
     mockMvc
         .perform(get(PATH + "/{id}", id).contentType(APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value("1"))
-        .andExpect(jsonPath("$.name").value("DTM"));
+        .andExpect(jsonPath("$.distribution").value("Stores"));
 
-    verify(service, times(1)).getDistributorById(id);
+    verify(service, times(1)).getDistributionChannelById(id);
   }
 
   @Test
-  void updateDistributor_whenDistributorIdInvalid_thenReturnNotFound() throws Exception {
-    String payload = loadPayload("distributors/payload_success.json");
+  void updateDistributionChannel_whenDistributionChannelIdInvalid_thenReturnNotFound()
+      throws Exception {
+    String payload = loadPayload("distribution-channels/payload_success.json");
     String invalidId = "some-invalid-id";
 
-    Distributor existingDistributor = fromJsonToObject(Distributor.class, payload);
+    DistributionChannel existingDistributionChannel =
+        fromJsonToObject(DistributionChannel.class, payload);
 
-    when(service.updateDistributor(invalidId, existingDistributor))
+    when(service.updateDistributionChannel(invalidId, existingDistributionChannel))
         .thenThrow(CatalogItemNotFoundException.class);
 
     mockMvc
@@ -228,41 +238,46 @@ public class DistributorControllerTest {
         .andExpect(
             jsonPath("$.messages")
                 .value(hasItem("The catalog for the given identifier was not found.")))
-        .andExpect(jsonPath("$.path").value("/distributors/some-invalid-id"));
+        .andExpect(jsonPath("$.path").value("/distribution-channels/some-invalid-id"));
 
-    verify(service, times(1)).updateDistributor(invalidId, existingDistributor);
+    verify(service, times(1)).updateDistributionChannel(invalidId, existingDistributionChannel);
   }
 
   @Test
-  void updateDistributor_whenDistributorIdValid_thenReturnUpdatedDistributor() throws Exception {
-    String payload = loadPayload("distributors/payload_success.json");
+  void
+      updateDistributionChannel_whenDistributionChannelIdValid_thenReturnUpdatedDistributionChannel()
+          throws Exception {
+    String payload = loadPayload("distribution-channels/payload_success.json");
     String id = "1";
 
-    Distributor existingDistributor = fromJsonToObject(Distributor.class, payload);
+    DistributionChannel existingDistributionChannel =
+        fromJsonToObject(DistributionChannel.class, payload);
 
-    when(service.updateDistributor(id, existingDistributor)).thenReturn(new Distributor(id, "DTM"));
+    when(service.updateDistributionChannel(id, existingDistributionChannel))
+        .thenReturn(new DistributionChannel(id, "Stores"));
 
     mockMvc
         .perform(put(PATH + "/{id}", id).contentType(APPLICATION_JSON).content(payload))
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value("1"))
-        .andExpect(jsonPath("$.name").value("DTM"));
+        .andExpect(jsonPath("$.distribution").value("Stores"));
 
-    verify(service, times(1)).updateDistributor(id, existingDistributor);
+    verify(service, times(1)).updateDistributionChannel(id, existingDistributionChannel);
   }
 
   @Test
-  void deleteDistributor_whenDistributorIdValid_thenReturnNoContent() throws Exception {
+  void deleteDistributionChannel_whenDistributionChannelIdValid_thenReturnNoContent()
+      throws Exception {
     String id = "1";
 
-    doNothing().when(service).deleteDistributor(id);
+    doNothing().when(service).deleteDistributionChannel(id);
 
     mockMvc
         .perform(delete(PATH + "/{id}", id).contentType(APPLICATION_JSON))
         .andDo(print())
         .andExpect(status().isNoContent());
 
-    verify(service, times(1)).deleteDistributor(id);
+    verify(service, times(1)).deleteDistributionChannel(id);
   }
 }
