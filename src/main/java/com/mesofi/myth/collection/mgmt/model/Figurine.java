@@ -33,4 +33,5 @@ public class Figurine {
   String tamashiiUrl;
 
   @Valid private DistributionChannel distributionChannel;
+  private LineUp lineUp;
 }
