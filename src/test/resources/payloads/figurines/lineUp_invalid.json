@@ -16,5 +16,10 @@
 	"releaseDate": "2024-10-02",
 	"releaseDateConfirmed": false
   },
-  "tamashiiUrl": "This is a very long url which is not acceptable"
+  "tamashiiUrl": "https://tamashiiweb.com/item/000",
+  "distributionChannel": {
+    "id": "1234567890",
+    "distribution": "Tamashii Store"
+  },
+  "lineUp": "A"
 }
