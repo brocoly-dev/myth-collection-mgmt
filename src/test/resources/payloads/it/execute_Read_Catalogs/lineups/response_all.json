@@ -1,0 +1,34 @@
+[
+  {
+    "key":"MYTH_CLOTH_EX",
+    "description":"Myth Cloth EX"
+  },
+  {
+    "key":"MYTH_CLOTH",
+    "description":"Myth Cloth"
+  },
+  {
+    "key":"APPENDIX",
+    "description":"Appendix"
+  },
+  {
+    "key":"SC_LEGEND",
+    "description":"Saint Cloth Legend"
+  },
+  {
+    "key":"FIGUARTS",
+    "description":"Figuarts"
+  },
+  {
+    "key":"FIGUARTS_ZERO",
+    "description":"Figuarts Zero Touche Metallique"
+  },
+  {
+    "key":"SC_CROWN",
+    "description":"Saint Cloth Crown"
+  },
+  {
+    "key":"DDP",
+    "description":"DD Panoramation"
+  }
+]

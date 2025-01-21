@@ -105,6 +105,48 @@ public class MythCollectionControllerTest {
   }
 
   @Test
+  void createFigurine_whenCategoryEmpty_thenReturnBadRequest() throws Exception {
+    String payload = loadPayload("figurines/category_empty.json");
+
+    mockMvc
+        .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
+        .andDo(print())
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("Bad Request"))
+        .andExpect(jsonPath("$.messages").isArray())
+        .andExpect(jsonPath("$.messages", hasSize(1)))
+        .andExpect(jsonPath("$.messages").value(hasItem("The required request body is missing.")))
+        .andExpect(
+            jsonPath("$.detailMessage")
+                .value(
+                    "JSON parse error: Cannot coerce empty String (\"\") to `com.mesofi.myth.collection.mgmt.model.Category` value (but could if coercion was enabled using `CoercionConfig`)"))
+        .andExpect(jsonPath("$.path").value(PATH));
+
+    verify(service, times(0)).createFigurine(any(Figurine.class));
+  }
+
+  @Test
+  void createFigurine_whenCategoryInvalid_thenReturnBadRequest() throws Exception {
+    String payload = loadPayload("figurines/category_invalid.json");
+
+    mockMvc
+        .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
+        .andDo(print())
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("Bad Request"))
+        .andExpect(jsonPath("$.messages").isArray())
+        .andExpect(jsonPath("$.messages", hasSize(1)))
+        .andExpect(jsonPath("$.messages").value(hasItem("The required request body is missing.")))
+        .andExpect(
+            jsonPath("$.detailMessage")
+                .value(
+                    "JSON parse error: Cannot deserialize value of type `com.mesofi.myth.collection.mgmt.model.Category` from String \"A\": not one of the values accepted for Enum class: [GOLD, SPECTER, SCALE, STEEL, SILVER, SECONDARY, JUDGE, V1, V2, V3, V4, SURPLICE, ROBE, GOD, BLACK, V5]"))
+        .andExpect(jsonPath("$.path").value(PATH));
+
+    verify(service, times(0)).createFigurine(any(Figurine.class));
+  }
+
+  @Test
   void createFigurine_whenDistributionChannelDistributionTooShort_thenReturnBadRequest()
       throws Exception {
     String payload = loadPayload("figurines/distributionChannel.distribution_tooShort.json");
@@ -434,7 +476,8 @@ public class MythCollectionControllerTest {
                 newFigurine.getTamashiiUrl(),
                 newFigurine.getDistributionChannel(),
                 newFigurine.getLineUp(),
-                newFigurine.getSeries()));
+                newFigurine.getSeries(),
+                newFigurine.getCategory()));
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
@@ -456,9 +499,53 @@ public class MythCollectionControllerTest {
         .andExpect(jsonPath("$.tamashiiUrl").value("https://tamashiiweb.com/item/000"))
         .andExpect(jsonPath("$.distributionChannel.id").value("1234567890"))
         .andExpect(jsonPath("$.distributionChannel.distribution").value("Tamashii Store"))
-        .andExpect(jsonPath("$.lineUp").value("MYTH_CLOTH_EX"));
+        .andExpect(jsonPath("$.lineUp").value("MYTH_CLOTH_EX"))
+        .andExpect(jsonPath("$.series").value("SAINT_SEIYA"))
+        .andExpect(jsonPath("$.category").value("V2"));
 
     verify(service, times(1)).createFigurine(newFigurine);
+  }
+
+  @Test
+  void createFigurine_whenSeriesEmpty_thenReturnBadRequest() throws Exception {
+    String payload = loadPayload("figurines/series_empty.json");
+
+    mockMvc
+        .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
+        .andDo(print())
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("Bad Request"))
+        .andExpect(jsonPath("$.messages").isArray())
+        .andExpect(jsonPath("$.messages", hasSize(1)))
+        .andExpect(jsonPath("$.messages").value(hasItem("The required request body is missing.")))
+        .andExpect(
+            jsonPath("$.detailMessage")
+                .value(
+                    "JSON parse error: Cannot coerce empty String (\"\") to `com.mesofi.myth.collection.mgmt.model.Series` value (but could if coercion was enabled using `CoercionConfig`)"))
+        .andExpect(jsonPath("$.path").value(PATH));
+
+    verify(service, times(0)).createFigurine(any(Figurine.class));
+  }
+
+  @Test
+  void createFigurine_whenSeriesInvalid_thenReturnBadRequest() throws Exception {
+    String payload = loadPayload("figurines/series_invalid.json");
+
+    mockMvc
+        .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
+        .andDo(print())
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("Bad Request"))
+        .andExpect(jsonPath("$.messages").isArray())
+        .andExpect(jsonPath("$.messages", hasSize(1)))
+        .andExpect(jsonPath("$.messages").value(hasItem("The required request body is missing.")))
+        .andExpect(
+            jsonPath("$.detailMessage")
+                .value(
+                    "JSON parse error: Cannot deserialize value of type `com.mesofi.myth.collection.mgmt.model.Series` from String \"A\": not one of the values accepted for Enum class: [SS_THE_BEGINNING, SAINT_SEIYA, SS_OMEGA, LOST_CANVAS, SAINTIA_SHO, SOG, SS_LEGEND_OF_SANTUARY]"))
+        .andExpect(jsonPath("$.path").value(PATH));
+
+    verify(service, times(0)).createFigurine(any(Figurine.class));
   }
 
   @Test

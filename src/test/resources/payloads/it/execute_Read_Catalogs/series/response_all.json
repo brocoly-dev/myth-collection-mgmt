@@ -1,0 +1,30 @@
+[
+  {
+    "key":"SAINT_SEIYA",
+    "description":"Saint Seiya"
+  },
+  {
+    "key":"SAINTIA_SHO",
+    "description":"Saintia Sho"
+  },
+  {
+    "key":"SOG",
+    "description":"Soul of Gold"
+  },
+  {
+    "key":"SS_LEGEND_OF_SANTUARY",
+    "description":"Saint Seiya Legend Of Sanctuary"
+  },
+  {
+    "key":"SS_OMEGA",
+    "description":"Saint Seiya Omega"
+  },
+  {
+    "key":"LOST_CANVAS",
+    "description":"The Lost Canvas"
+  },
+  {
+    "key":"SS_THE_BEGINNING",
+    "description":"Saint Seiya The Beginning"
+  }
+]

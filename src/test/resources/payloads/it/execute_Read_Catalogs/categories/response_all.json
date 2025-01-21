@@ -1,0 +1,66 @@
+[
+  {
+    "key":"V1",
+    "description":"Bronze Saint V1"
+  },
+  {
+    "key":"V2",
+    "description":"Bronze Saint V2"
+  },
+  {
+    "key":"V3",
+    "description":"Bronze Saint V3"
+  },
+  {
+    "key":"V4",
+    "description":"Bronze Saint V4"
+  },
+  {
+    "key":"V5",
+    "description":"Bronze Saint V5"
+  },
+  {
+    "key":"SECONDARY",
+    "description":"Bronze Secondary"
+  },
+  {
+    "key":"BLACK",
+    "description":"Black Saint"
+  },
+  {
+    "key":"STEEL",
+    "description":"Steel"
+  },
+  {
+    "key":"SILVER",
+    "description":"Silver Saint"
+  },
+  {
+    "key":"GOLD",
+    "description":"Golden Saint"
+  },
+  {
+    "key":"ROBE",
+    "description":"God Robe"
+  },
+  {
+    "key":"SCALE",
+    "description":"Poseidon Scale"
+  },
+  {
+    "key":"SURPLICE",
+    "description":"Surplice Saint"
+  },
+  {
+    "key":"SPECTER",
+    "description":"Specter"
+  },
+  {
+    "key":"JUDGE",
+    "description":"Judge"
+  },
+  {
+    "key":"GOD",
+    "description":"God"
+  }
+]
