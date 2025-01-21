@@ -23,5 +23,16 @@
   },
   "lineUp": "MYTH_CLOTH_EX",
   "series": "SAINT_SEIYA",
-  "category": "V2"
+  "category": "V2",
+  "revival": true,
+  "oce": false,
+  "metal": false,
+  "golden": false,
+  "gold": true,
+  "surplice": false,
+  "broken": false,
+  "plain": false,
+  "hk": true,
+  "comic": false,
+  "set": false
 }
