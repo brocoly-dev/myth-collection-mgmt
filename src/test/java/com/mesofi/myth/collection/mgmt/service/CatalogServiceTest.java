@@ -34,7 +34,7 @@ public class CatalogServiceTest {
     assertEquals("Saintia Sho", result.get(1).getDescription());
     assertEquals("SOG", result.get(2).getKey());
     assertEquals("Soul of Gold", result.get(2).getDescription());
-    assertEquals("SS_LEGEND_OF_SANTUARY", result.get(3).getKey());
+    assertEquals("SS_LEGEND_OF_SANCTUARY", result.get(3).getKey());
     assertEquals("Saint Seiya Legend Of Sanctuary", result.get(3).getDescription());
     assertEquals("SS_OMEGA", result.get(4).getKey());
     assertEquals("Saint Seiya Omega", result.get(4).getDescription());

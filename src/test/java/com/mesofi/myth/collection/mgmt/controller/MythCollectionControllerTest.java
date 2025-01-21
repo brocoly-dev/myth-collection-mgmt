@@ -542,7 +542,7 @@ public class MythCollectionControllerTest {
         .andExpect(
             jsonPath("$.detailMessage")
                 .value(
-                    "JSON parse error: Cannot deserialize value of type `com.mesofi.myth.collection.mgmt.model.Series` from String \"A\": not one of the values accepted for Enum class: [SS_THE_BEGINNING, SAINT_SEIYA, SS_OMEGA, LOST_CANVAS, SAINTIA_SHO, SOG, SS_LEGEND_OF_SANTUARY]"))
+                    "JSON parse error: Cannot deserialize value of type `com.mesofi.myth.collection.mgmt.model.Series` from String \"A\": not one of the values accepted for Enum class: [SS_THE_BEGINNING, SAINT_SEIYA, SS_OMEGA, LOST_CANVAS, SAINTIA_SHO, SOG, SS_LEGEND_OF_SANCTUARY]"))
         .andExpect(jsonPath("$.path").value(PATH));
 
     verify(service, times(0)).createFigurine(any(Figurine.class));
