@@ -34,4 +34,5 @@ public class Figurine {
 
   @Valid private DistributionChannel distributionChannel;
   private LineUp lineUp;
+  private Series series;
 }

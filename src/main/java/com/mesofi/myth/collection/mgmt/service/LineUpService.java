@@ -6,13 +6,11 @@ import com.mesofi.myth.collection.mgmt.model.LineUp;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-@AllArgsConstructor
 public class LineUpService {
 
   public List<CatalogKeyDescription> getAllLineUps() {
