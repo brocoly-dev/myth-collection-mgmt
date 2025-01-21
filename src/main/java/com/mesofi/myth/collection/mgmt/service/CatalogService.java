@@ -6,11 +6,9 @@ import com.mesofi.myth.collection.mgmt.model.Describable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /** Service used to handle common catalogs. */
-@Slf4j
 @Service
 public class CatalogService {
 

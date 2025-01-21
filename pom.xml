@@ -169,6 +169,7 @@
                     <testStrengthThreshold>${pitest-threshold.value}</testStrengthThreshold>
                     <excludedClasses>
                         <param>az.marketing.communication.optsync.*Config</param>
+                        <param>com.mesofi.myth.collection.mgmt.model.*</param>
                     </excludedClasses>
                     <!--
                     <excludedTestClasses>
