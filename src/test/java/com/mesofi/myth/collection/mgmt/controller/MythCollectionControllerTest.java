@@ -477,7 +477,18 @@ public class MythCollectionControllerTest {
                 newFigurine.getDistributionChannel(),
                 newFigurine.getLineUp(),
                 newFigurine.getSeries(),
-                newFigurine.getCategory()));
+                newFigurine.getCategory(),
+                newFigurine.isRevival(),
+                newFigurine.isOce(),
+                newFigurine.isMetal(),
+                newFigurine.isGolden(),
+                newFigurine.isGold(),
+                newFigurine.isSurplice(),
+                newFigurine.isBroken(),
+                newFigurine.isPlain(),
+                newFigurine.isHk(),
+                newFigurine.isComic(),
+                newFigurine.isSet()));
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
@@ -501,7 +512,17 @@ public class MythCollectionControllerTest {
         .andExpect(jsonPath("$.distributionChannel.distribution").value("Tamashii Store"))
         .andExpect(jsonPath("$.lineUp").value("MYTH_CLOTH_EX"))
         .andExpect(jsonPath("$.series").value("SAINT_SEIYA"))
-        .andExpect(jsonPath("$.category").value("V2"));
+        .andExpect(jsonPath("$.revival").value(true))
+        .andExpect(jsonPath("$.oce").value(false))
+        .andExpect(jsonPath("$.metal").value(false))
+        .andExpect(jsonPath("$.golden").value(false))
+        .andExpect(jsonPath("$.gold").value(true))
+        .andExpect(jsonPath("$.surplice").value(false))
+        .andExpect(jsonPath("$.broken").value(false))
+        .andExpect(jsonPath("$.plain").value(false))
+        .andExpect(jsonPath("$.hk").value(true))
+        .andExpect(jsonPath("$.comic").value(false))
+        .andExpect(jsonPath("$.set").value(false));
 
     verify(service, times(1)).createFigurine(newFigurine);
   }

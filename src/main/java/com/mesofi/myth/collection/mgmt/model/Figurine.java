@@ -30,10 +30,23 @@ public class Figurine {
   @Valid private Distribution distributionMXN;
 
   @Size(max = 35)
-  String tamashiiUrl;
+  private String tamashiiUrl;
 
   @Valid private DistributionChannel distributionChannel;
+
   private LineUp lineUp;
   private Series series;
   private Category category;
+
+  private boolean revival;
+  private boolean oce;
+  private boolean metal;
+  private boolean golden;
+  private boolean gold;
+  private boolean surplice;
+  private boolean broken;
+  private boolean plain;
+  private boolean hk;
+  private boolean comic;
+  private boolean set;
 }
