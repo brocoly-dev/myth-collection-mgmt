@@ -7,6 +7,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mesofi.myth.collection.mgmt.controller.AnniversaryController;
 import com.mesofi.myth.collection.mgmt.controller.CategoryController;
 import com.mesofi.myth.collection.mgmt.controller.DistributionChannelController;
 import com.mesofi.myth.collection.mgmt.controller.DistributorController;
@@ -265,6 +266,7 @@ public class MythCollectionIT {
     return Stream.of(
         Arguments.of(LineUpController.MAPPING, "/lineups/response_all.json"),
         Arguments.of(SeriesController.MAPPING, "/series/response_all.json"),
-        Arguments.of(CategoryController.MAPPING, "/categories/response_all.json"));
+        Arguments.of(CategoryController.MAPPING, "/categories/response_all.json"),
+        Arguments.of(AnniversaryController.MAPPING, "/anniversaries/response_all.json"));
   }
 }

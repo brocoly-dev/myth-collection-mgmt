@@ -45,7 +45,8 @@ public class MythCollectionServiceTest {
             false,
             false,
             false,
-            false);
+            false,
+            null);
     Figurine savedFigurine =
         new Figurine(
             "1",
@@ -67,7 +68,8 @@ public class MythCollectionServiceTest {
             false,
             false,
             false,
-            false);
+            false,
+            null);
     when(repository.save(figurineToSave)).thenReturn(savedFigurine);
 
     // Act

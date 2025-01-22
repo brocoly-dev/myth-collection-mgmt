@@ -37,7 +37,8 @@ public class MythCollectionRepositoryTest {
             false,
             false,
             false,
-            false);
+            false,
+            null);
     Figurine savedFigurine = repository.save(figurineToSave);
 
     assertTrue(repository.findById(savedFigurine.getId()).isPresent());

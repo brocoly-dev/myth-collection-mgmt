@@ -49,4 +49,6 @@ public class Figurine {
   private boolean hk;
   private boolean comic;
   private boolean set;
+
+  private Anniversary anniversary;
 }

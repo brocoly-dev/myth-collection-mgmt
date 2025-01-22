@@ -53,6 +53,48 @@ public class MythCollectionControllerTest {
   }
 
   @Test
+  void createFigurine_whenAnniversaryEmpty_thenReturnBadRequest() throws Exception {
+    String payload = loadPayload("figurines/anniversary_empty.json");
+
+    mockMvc
+        .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
+        .andDo(print())
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("Bad Request"))
+        .andExpect(jsonPath("$.messages").isArray())
+        .andExpect(jsonPath("$.messages", hasSize(1)))
+        .andExpect(jsonPath("$.messages").value(hasItem("The required request body is missing.")))
+        .andExpect(
+            jsonPath("$.detailMessage")
+                .value(
+                    "JSON parse error: Cannot coerce empty String (\"\") to `com.mesofi.myth.collection.mgmt.model.Anniversary` value (but could if coercion was enabled using `CoercionConfig`)"))
+        .andExpect(jsonPath("$.path").value(PATH));
+
+    verify(service, times(0)).createFigurine(any(Figurine.class));
+  }
+
+  @Test
+  void createFigurine_whenAnniversaryInvalid_thenReturnBadRequest() throws Exception {
+    String payload = loadPayload("figurines/anniversary_invalid.json");
+
+    mockMvc
+        .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
+        .andDo(print())
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("Bad Request"))
+        .andExpect(jsonPath("$.messages").isArray())
+        .andExpect(jsonPath("$.messages", hasSize(1)))
+        .andExpect(jsonPath("$.messages").value(hasItem("The required request body is missing.")))
+        .andExpect(
+            jsonPath("$.detailMessage")
+                .value(
+                    "JSON parse error: Cannot deserialize value of type `com.mesofi.myth.collection.mgmt.model.Anniversary` from String \"A\": not one of the values accepted for Enum class: [A_50, A_40, A_20, A_10, A_15]"))
+        .andExpect(jsonPath("$.path").value(PATH));
+
+    verify(service, times(0)).createFigurine(any(Figurine.class));
+  }
+
+  @Test
   void createFigurine_whenBaseNameEmpty_thenReturnBadRequest() throws Exception {
     String payload = loadPayload("figurines/baseName_empty.json");
 
@@ -488,7 +530,8 @@ public class MythCollectionControllerTest {
                 newFigurine.isPlain(),
                 newFigurine.isHk(),
                 newFigurine.isComic(),
-                newFigurine.isSet()));
+                newFigurine.isSet(),
+                newFigurine.getAnniversary()));
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
@@ -522,7 +565,8 @@ public class MythCollectionControllerTest {
         .andExpect(jsonPath("$.plain").value(false))
         .andExpect(jsonPath("$.hk").value(true))
         .andExpect(jsonPath("$.comic").value(false))
-        .andExpect(jsonPath("$.set").value(false));
+        .andExpect(jsonPath("$.set").value(false))
+        .andExpect(jsonPath("$.anniversary").value("A_20"));
 
     verify(service, times(1)).createFigurine(newFigurine);
   }
