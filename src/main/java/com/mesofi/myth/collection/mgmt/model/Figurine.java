@@ -51,4 +51,5 @@ public class Figurine {
   private boolean set;
 
   private Anniversary anniversary;
+  private String remarks;
 }

@@ -531,7 +531,8 @@ public class MythCollectionControllerTest {
                 newFigurine.isHk(),
                 newFigurine.isComic(),
                 newFigurine.isSet(),
-                newFigurine.getAnniversary()));
+                newFigurine.getAnniversary(),
+                newFigurine.getRemarks()));
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))
@@ -566,7 +567,8 @@ public class MythCollectionControllerTest {
         .andExpect(jsonPath("$.hk").value(true))
         .andExpect(jsonPath("$.comic").value(false))
         .andExpect(jsonPath("$.set").value(false))
-        .andExpect(jsonPath("$.anniversary").value("A_20"));
+        .andExpect(jsonPath("$.anniversary").value("A_20"))
+        .andExpect(jsonPath("$.remarks").value("Some Information\ngoes here"));
 
     verify(service, times(1)).createFigurine(newFigurine);
   }

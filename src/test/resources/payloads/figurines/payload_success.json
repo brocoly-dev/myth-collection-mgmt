@@ -35,5 +35,6 @@
   "hk": true,
   "comic": false,
   "set": false,
-  "anniversary": "A_20"
+  "anniversary": "A_20",
+  "remarks": "Some Information\ngoes here"
 }

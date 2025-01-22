@@ -38,6 +38,7 @@ public class MythCollectionRepositoryTest {
             false,
             false,
             false,
+            null,
             null);
     Figurine savedFigurine = repository.save(figurineToSave);
 
