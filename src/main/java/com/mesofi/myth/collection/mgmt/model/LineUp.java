@@ -6,7 +6,7 @@ public enum LineUp implements Describable {
   APPENDIX("Appendix"),
   SC_LEGEND("Saint Cloth Legend"),
   FIGUARTS("Figuarts"),
-  FIGUARTS_ZERO("Figuarts Zero Touche Metallique"),
+  FIGUARTS_ZERO("Figuarts Zero Touche Métallique"),
   SC_CROWN("Saint Cloth Crown"),
   DDP("DD Panoramation");
 
