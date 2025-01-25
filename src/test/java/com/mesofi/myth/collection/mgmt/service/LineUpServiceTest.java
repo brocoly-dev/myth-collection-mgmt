@@ -38,7 +38,7 @@ public class LineUpServiceTest {
     assertEquals("FIGUARTS", result.get(4).getKey());
     assertEquals("Figuarts", result.get(4).getDescription());
     assertEquals("FIGUARTS_ZERO", result.get(5).getKey());
-    assertEquals("Figuarts Zero Touche Metallique", result.get(5).getDescription());
+    assertEquals("Figuarts Zero Touche Métallique", result.get(5).getDescription());
     assertEquals("SC_CROWN", result.get(6).getKey());
     assertEquals("Saint Cloth Crown", result.get(6).getDescription());
     assertEquals("DDP", result.get(7).getKey());

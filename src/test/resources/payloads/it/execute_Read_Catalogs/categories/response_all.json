@@ -62,5 +62,9 @@
   {
     "key":"GOD",
     "description":"God"
+  },
+  {
+    "key":"INHERITOR",
+    "description":"Inheritor"
   }
 ]

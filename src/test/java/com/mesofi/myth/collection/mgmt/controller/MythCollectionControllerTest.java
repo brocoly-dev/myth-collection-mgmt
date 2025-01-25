@@ -9,14 +9,17 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.mesofi.myth.collection.mgmt.model.Category;
 import com.mesofi.myth.collection.mgmt.model.Figurine;
 import com.mesofi.myth.collection.mgmt.service.MythCollectionService;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,7 +91,7 @@ public class MythCollectionControllerTest {
         .andExpect(
             jsonPath("$.detailMessage")
                 .value(
-                    "JSON parse error: Cannot deserialize value of type `com.mesofi.myth.collection.mgmt.model.Anniversary` from String \"A\": not one of the values accepted for Enum class: [A_50, A_40, A_20, A_10, A_15]"))
+                    "JSON parse error: Cannot deserialize value of type `com.mesofi.myth.collection.mgmt.model.Anniversary` from String \"A\": not one of the values accepted for Enum class: [A_15, A_50, A_40, A_30, A_20, A_10]"))
         .andExpect(jsonPath("$.path").value(PATH));
 
     verify(service, times(0)).createFigurine(any(Figurine.class));
@@ -182,7 +185,7 @@ public class MythCollectionControllerTest {
         .andExpect(
             jsonPath("$.detailMessage")
                 .value(
-                    "JSON parse error: Cannot deserialize value of type `com.mesofi.myth.collection.mgmt.model.Category` from String \"A\": not one of the values accepted for Enum class: [GOLD, SPECTER, SCALE, STEEL, SILVER, SECONDARY, JUDGE, V1, V2, V3, V4, SURPLICE, ROBE, GOD, BLACK, V5]"))
+                    "JSON parse error: Cannot deserialize value of type `com.mesofi.myth.collection.mgmt.model.Category` from String \"A\": not one of the values accepted for Enum class: [GOLD, SPECTER, SCALE, STEEL, SILVER, SECONDARY, JUDGE, V1, V2, V3, INHERITOR, SURPLICE, ROBE, GOD, BLACK, V4, V5]"))
         .andExpect(jsonPath("$.path").value(PATH));
 
     verify(service, times(0)).createFigurine(any(Figurine.class));
@@ -513,6 +516,7 @@ public class MythCollectionControllerTest {
             new Figurine(
                 "1",
                 newFigurine.getBaseName(),
+                newFigurine.getDisplayableName(),
                 newFigurine.getDistributionJPY(),
                 newFigurine.getDistributionMXN(),
                 newFigurine.getTamashiiUrl(),
@@ -525,7 +529,6 @@ public class MythCollectionControllerTest {
                 newFigurine.isMetal(),
                 newFigurine.isGolden(),
                 newFigurine.isGold(),
-                newFigurine.isSurplice(),
                 newFigurine.isBroken(),
                 newFigurine.isPlain(),
                 newFigurine.isHk(),
@@ -561,7 +564,6 @@ public class MythCollectionControllerTest {
         .andExpect(jsonPath("$.metal").value(false))
         .andExpect(jsonPath("$.golden").value(false))
         .andExpect(jsonPath("$.gold").value(true))
-        .andExpect(jsonPath("$.surplice").value(false))
         .andExpect(jsonPath("$.broken").value(false))
         .andExpect(jsonPath("$.plain").value(false))
         .andExpect(jsonPath("$.hk").value(true))
@@ -631,5 +633,52 @@ public class MythCollectionControllerTest {
         .andExpect(jsonPath("$.path").value(PATH));
 
     verify(service, times(0)).createFigurine(any(Figurine.class));
+  }
+
+  @Test
+  void getAllFigurines_whenExistingFigurines_thenReturnOK() throws Exception {
+    Figurine figurine1 = new Figurine();
+    Figurine figurine2 = new Figurine();
+
+    figurine1.setBaseName("Pegasus Seiya");
+    figurine1.setCategory(Category.V1);
+
+    figurine2.setBaseName("Sea Emperor");
+    figurine2.setCategory(Category.SCALE);
+
+    when(service.getAllFigurines()).thenReturn(List.of(figurine1, figurine2));
+
+    mockMvc
+        .perform(get(PATH).contentType(APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isArray())
+        .andExpect(jsonPath("$", hasSize(2)))
+        .andExpect(jsonPath("$[0].baseName").value("Pegasus Seiya"))
+        .andExpect(jsonPath("$[0].category").value("V1"))
+        .andExpect(jsonPath("$[0].revival").value(false))
+        .andExpect(jsonPath("$[0].oce").value(false))
+        .andExpect(jsonPath("$[0].metal").value(false))
+        .andExpect(jsonPath("$[0].golden").value(false))
+        .andExpect(jsonPath("$[0].gold").value(false))
+        .andExpect(jsonPath("$[0].broken").value(false))
+        .andExpect(jsonPath("$[0].plain").value(false))
+        .andExpect(jsonPath("$[0].hk").value(false))
+        .andExpect(jsonPath("$[0].comic").value(false))
+        .andExpect(jsonPath("$[0].set").value(false))
+        .andExpect(jsonPath("$[1].baseName").value("Sea Emperor"))
+        .andExpect(jsonPath("$[1].category").value("SCALE"))
+        .andExpect(jsonPath("$[1].revival").value(false))
+        .andExpect(jsonPath("$[1].oce").value(false))
+        .andExpect(jsonPath("$[1].metal").value(false))
+        .andExpect(jsonPath("$[1].golden").value(false))
+        .andExpect(jsonPath("$[1].gold").value(false))
+        .andExpect(jsonPath("$[1].broken").value(false))
+        .andExpect(jsonPath("$[1].plain").value(false))
+        .andExpect(jsonPath("$[1].hk").value(false))
+        .andExpect(jsonPath("$[1].comic").value(false))
+        .andExpect(jsonPath("$[1].set").value(false));
+
+    verify(service, times(1)).getAllFigurines();
   }
 }

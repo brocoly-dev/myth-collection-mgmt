@@ -16,7 +16,8 @@ public enum Category implements Describable {
   SURPLICE("Surplice Saint"),
   SPECTER("Specter"),
   JUDGE("Judge"),
-  GOD("God");
+  GOD("God"),
+  INHERITOR("Inheritor");
   private final String description;
 
   Category(String description) {

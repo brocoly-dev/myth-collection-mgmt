@@ -26,6 +26,8 @@ public class Figurine {
   @Size(min = 3, max = 20)
   private String baseName;
 
+  private String displayableName; // This field is calculated ...
+
   @Valid private Distribution distributionJPY;
   @Valid private Distribution distributionMXN;
 
@@ -43,7 +45,6 @@ public class Figurine {
   private boolean metal;
   private boolean golden;
   private boolean gold;
-  private boolean surplice;
   private boolean broken;
   private boolean plain;
   private boolean hk;
