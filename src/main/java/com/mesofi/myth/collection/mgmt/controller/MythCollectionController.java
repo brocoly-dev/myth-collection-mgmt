@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -57,10 +58,11 @@ public class MythCollectionController {
   /**
    * Retrieves all the existing figurines.
    *
+   * @param excludeRestocks By default, the restocks are included in the list.
    * @return A list of figurines.
    */
   @GetMapping
-  public List<Figurine> getAllFigurines() {
-    return service.getAllFigurines();
+  public List<Figurine> getAllFigurines(@RequestParam(required = false) boolean excludeRestocks) {
+    return service.getAllFigurines(excludeRestocks);
   }
 }

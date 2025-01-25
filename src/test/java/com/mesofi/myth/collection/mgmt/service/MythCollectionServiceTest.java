@@ -2,6 +2,7 @@ package com.mesofi.myth.collection.mgmt.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -9,10 +10,14 @@ import static org.mockito.Mockito.when;
 import com.mesofi.myth.collection.mgmt.model.Anniversary;
 import com.mesofi.myth.collection.mgmt.model.Category;
 import com.mesofi.myth.collection.mgmt.model.Distribution;
+import com.mesofi.myth.collection.mgmt.model.DistributionChannel;
+import com.mesofi.myth.collection.mgmt.model.Distributor;
 import com.mesofi.myth.collection.mgmt.model.Figurine;
 import com.mesofi.myth.collection.mgmt.model.LineUp;
+import com.mesofi.myth.collection.mgmt.model.Restock;
 import com.mesofi.myth.collection.mgmt.model.Series;
 import com.mesofi.myth.collection.mgmt.repository.MythCollectionRepository;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -53,7 +58,7 @@ public class MythCollectionServiceTest {
   }
 
   @Test
-  void getAllFigurines_whenExistingFigurines_thenGetAllFigurines() {
+  void getAllFigurines_whenExistingFigurines_thenGetAllFigurinesWithRestocks() {
     Figurine figurine1 = new Figurine();
     Figurine figurine2 = new Figurine();
 
@@ -67,13 +72,107 @@ public class MythCollectionServiceTest {
     when(repository.findAll()).thenReturn(List.of(figurine1, figurine2));
 
     // Act
-    List<Figurine> result = service.getAllFigurines();
+    List<Figurine> result = service.getAllFigurines(false);
+
+    // Assert
     assertNotNull(result);
     assertEquals(2, result.size());
+    assertEquals(result.get(0).getBaseName(), "Pegasus Seiya");
     assertEquals(result.get(0).getDisplayableName(), "Pegasus Seiya");
+    assertNull(result.get(0).getRestocks());
 
     assertEquals(result.get(1).getBaseName(), "Sea Emperor");
     assertEquals(result.get(1).getDisplayableName(), "Sea Emperor");
+    assertNull(result.get(1).getRestocks());
+    verify(repository).findAll();
+  }
+
+  @Test
+  void getAllFigurines_whenDifferentFigurines_thenGetAllFigurinesWithoutRestocks() {
+    Figurine figurine1 = new Figurine();
+    Figurine figurine2 = new Figurine();
+
+    figurine1.setBaseName("Pegasus Seiya");
+    figurine1.setCategory(Category.V1);
+
+    figurine2.setBaseName("Sea Emperor");
+    figurine2.setCategory(Category.SCALE);
+
+    // Arrange
+    when(repository.findAll()).thenReturn(List.of(figurine1, figurine2));
+
+    // Act
+    List<Figurine> result = service.getAllFigurines(true);
+
+    // Assert
+    assertNotNull(result);
+    assertEquals(2, result.size());
+    assertEquals(result.get(0).getBaseName(), "Pegasus Seiya");
+    assertEquals(result.get(0).getDisplayableName(), "Pegasus Seiya");
+    assertEquals(result.get(0).getCategory(), Category.V1);
+    assertNull(result.get(0).getRestocks());
+
+    assertEquals(result.get(1).getBaseName(), "Sea Emperor");
+    assertEquals(result.get(1).getDisplayableName(), "Sea Emperor");
+    assertEquals(result.get(1).getCategory(), Category.SCALE);
+    assertNull(result.get(1).getRestocks());
+
+    verify(repository).findAll();
+  }
+
+  @Test
+  void getAllFigurines_whenSameFigurines_thenGetAllFigurinesWithoutRestocks() {
+    Figurine figurine1 = new Figurine();
+    Figurine figurine2 = new Figurine();
+
+    Distribution distributionJPY = new Distribution();
+    distributionJPY.setBasePrice(new BigDecimal("12000"));
+
+    Distribution distributionMXN = new Distribution();
+    distributionMXN.setDistributor(new Distributor("123", "DAM"));
+    distributionMXN.setBasePrice(new BigDecimal("1500"));
+
+    figurine1.setBaseName("Pegasus Seiya");
+    figurine1.setCategory(Category.V1);
+    figurine1.setDistributionJPY(distributionJPY);
+    figurine1.setDistributionMXN(distributionMXN);
+    figurine1.setTamashiiUrl("https://tamashiiweb.com/item/1288");
+    figurine1.setDistributionChannel(new DistributionChannel("123", "Stores"));
+    figurine1.setRemarks("some comment");
+
+    figurine2.setBaseName("Pegasus Seiya");
+    figurine2.setCategory(Category.V1);
+    figurine2.setDistributionJPY(distributionJPY);
+    figurine2.setDistributionMXN(distributionMXN);
+    figurine2.setTamashiiUrl("https://tamashiiweb.com/item/1288");
+    figurine2.setDistributionChannel(new DistributionChannel("123", "Stores"));
+    figurine2.setRemarks("some comment");
+
+    // Arrange
+    when(repository.findAll()).thenReturn(List.of(figurine1, figurine2));
+
+    // Act
+    List<Figurine> result = service.getAllFigurines(true);
+
+    // Assert
+    assertNotNull(result);
+    assertEquals(1, result.size());
+    assertEquals(result.get(0).getBaseName(), "Pegasus Seiya");
+    assertEquals(result.get(0).getDisplayableName(), "Pegasus Seiya");
+    assertEquals(result.get(0).getCategory(), Category.V1);
+
+    List<Restock> restocks = result.get(0).getRestocks();
+
+    assertNotNull(restocks);
+    assertEquals(1, restocks.size());
+    assertEquals(distributionJPY, restocks.get(0).getDistributionJPY());
+    assertEquals(distributionMXN, restocks.get(0).getDistributionMXN());
+    assertEquals("https://tamashiiweb.com/item/1288", restocks.get(0).getTamashiiUrl());
+    assertEquals(
+        new DistributionChannel("123", "Stores"), restocks.get(0).getDistributionChannel());
+    assertEquals("some comment", restocks.get(0).getRemarks());
+
+    verify(repository).findAll();
   }
 
   @Test

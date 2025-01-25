@@ -4,8 +4,10 @@ import com.mesofi.myth.collection.mgmt.model.Anniversary;
 import com.mesofi.myth.collection.mgmt.model.Category;
 import com.mesofi.myth.collection.mgmt.model.Figurine;
 import com.mesofi.myth.collection.mgmt.model.LineUp;
+import com.mesofi.myth.collection.mgmt.model.Restock;
 import com.mesofi.myth.collection.mgmt.model.Series;
 import com.mesofi.myth.collection.mgmt.repository.MythCollectionRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
@@ -40,13 +42,43 @@ public class MythCollectionService {
   /**
    * Gets all the existing figurine.
    *
+   * @param excludeRestocks Flag to exclude the restocks.
    * @return A list with all the existing figurines.
    */
-  public List<Figurine> getAllFigurines() {
+  public List<Figurine> getAllFigurines(boolean excludeRestocks) {
     log.info("Retrieving all the existing figurines ...");
 
+    List<Figurine> allFigurines = repository.findAll();
+
+    List<Figurine> allFigurinesFiltered = new ArrayList<>();
+    if (excludeRestocks) {
+      for (Figurine currFigurine : allFigurines) {
+        if (allFigurinesFiltered.contains(currFigurine)) {
+          for (Figurine currFiltered : allFigurinesFiltered) {
+            if (currFiltered.equals(currFigurine)) {
+              if (Objects.isNull(currFiltered.getRestocks())) {
+                currFiltered.setRestocks(new ArrayList<>());
+              }
+              Restock restock = new Restock();
+              restock.setDistributionJPY(currFigurine.getDistributionJPY());
+              restock.setDistributionMXN(currFigurine.getDistributionMXN());
+              restock.setTamashiiUrl(currFigurine.getTamashiiUrl());
+              restock.setDistributionChannel(currFigurine.getDistributionChannel());
+              restock.setRemarks(currFigurine.getRemarks());
+
+              currFiltered.getRestocks().add(restock);
+            }
+          }
+        } else {
+          allFigurinesFiltered.add(currFigurine);
+        }
+      }
+    } else {
+      allFigurinesFiltered = allFigurines;
+    }
+
     List<Figurine> existingFigurines =
-        repository.findAll().stream()
+        allFigurinesFiltered.stream()
             .peek(figurine -> figurine.setDisplayableName(calculateDisplayableName(figurine)))
             .toList();
 

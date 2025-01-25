@@ -648,7 +648,7 @@ public class MythCollectionControllerTest {
     figurine2.setBaseName("Sea Emperor");
     figurine2.setCategory(Category.SCALE);
 
-    when(service.getAllFigurines()).thenReturn(List.of(figurine1, figurine2));
+    when(service.getAllFigurines(false)).thenReturn(List.of(figurine1, figurine2));
 
     mockMvc
         .perform(get(PATH).contentType(APPLICATION_JSON))
@@ -681,6 +681,6 @@ public class MythCollectionControllerTest {
         .andExpect(jsonPath("$[1].comic").value(false))
         .andExpect(jsonPath("$[1].set").value(false));
 
-    verify(service, times(1)).getAllFigurines();
+    verify(service, times(1)).getAllFigurines(false);
   }
 }
