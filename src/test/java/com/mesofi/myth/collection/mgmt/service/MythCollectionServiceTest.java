@@ -14,6 +14,7 @@ import com.mesofi.myth.collection.mgmt.model.LineUp;
 import com.mesofi.myth.collection.mgmt.model.Series;
 import com.mesofi.myth.collection.mgmt.repository.MythCollectionRepository;
 import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -87,8 +88,33 @@ public class MythCollectionServiceTest {
     assertNotNull(result);
     assertEquals("1", result.getId());
     assertEquals("Seiya", result.getBaseName());
+    assertEquals("Seiya", result.getDisplayableName());
     assertEquals("https://tamashiiweb.com/item/000", result.getTamashiiUrl());
     verify(repository, times(1)).save(figurineToSave);
+  }
+
+  @Test
+  void getAllFigurines_whenExistingFigurines_thenGetAllFigurines() {
+    Figurine figurine1 = new Figurine();
+    Figurine figurine2 = new Figurine();
+
+    figurine1.setBaseName("Pegasus Seiya");
+    figurine1.setCategory(Category.V1);
+
+    figurine2.setBaseName("Sea Emperor");
+    figurine2.setCategory(Category.SCALE);
+
+    // Arrange
+    when(repository.findAll()).thenReturn(List.of(figurine1, figurine2));
+
+    // Act
+    List<Figurine> result = service.getAllFigurines();
+    assertNotNull(result);
+    assertEquals(2, result.size());
+    assertEquals(result.get(0).getDisplayableName(), "Pegasus Seiya");
+
+    assertEquals(result.get(1).getBaseName(), "Sea Emperor");
+    assertEquals(result.get(1).getDisplayableName(), "Sea Emperor");
   }
 
   @Test

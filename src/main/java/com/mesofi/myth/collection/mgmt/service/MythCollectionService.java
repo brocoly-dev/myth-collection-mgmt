@@ -19,28 +19,47 @@ public class MythCollectionService {
 
   private final MythCollectionRepository repository;
 
-  public Figurine createFigurine(Figurine figurine) {
+  /**
+   * Creates a new figurine.
+   *
+   * @param figurine The figurine to be created.
+   * @return The figurine created in the DB.
+   */
+  public Figurine createFigurine(final Figurine figurine) {
     log.info("A new figure is about to be created ...");
 
     Figurine created = repository.save(figurine);
+
+    // Calculates additional information ...
+    created.setDisplayableName(calculateDisplayableName(created));
+
     log.info("A new figure has been created with id: {}", created.getId());
-    calculateAdditionalInfo(created);
     return created;
   }
 
+  /**
+   * Gets all the existing figurine.
+   *
+   * @return A list with all the existing figurines.
+   */
   public List<Figurine> getAllFigurines() {
     log.info("Retrieving all the existing figurines ...");
 
     List<Figurine> existingFigurines =
-        repository.findAll().stream().peek(this::calculateAdditionalInfo).toList();
+        repository.findAll().stream()
+            .peek(figurine -> figurine.setDisplayableName(calculateDisplayableName(figurine)))
+            .toList();
+
     log.info("Found {} figurines", existingFigurines.size());
     return existingFigurines;
   }
 
-  private void calculateAdditionalInfo(Figurine f) {
-    f.setDisplayableName(calculateDisplayableName(f));
-  }
-
+  /**
+   * Calculates the displayable name based on the figure attributes.
+   *
+   * @param figurine The figurine with the all its attributes.
+   * @return The displayable name.
+   */
   public String calculateDisplayableName(Figurine figurine) {
     final String MYSTERIOUS = "mysterious";
     final String JUMP = "jump";
@@ -113,7 +132,7 @@ public class MythCollectionService {
     if (Series.SOG == figurine.getSeries()) {
       name += " God Cloth";
     }
-    if (Series.SAINTIA_SHO == figurine.getSeries() & Category.GOLD == figurine.getCategory()) {
+    if (Series.SAINTIA_SHO == figurine.getSeries() && Category.GOLD == figurine.getCategory()) {
       name += " Saintia Sho Color Edition";
     }
 
