@@ -511,31 +511,33 @@ public class MythCollectionControllerTest {
 
     Figurine newFigurine = fromJsonToObject(Figurine.class, payload);
 
-    when(service.createFigurine(newFigurine))
-        .thenReturn(
-            new Figurine(
-                "1",
-                newFigurine.getBaseName(),
-                newFigurine.getDisplayableName(),
-                newFigurine.getDistributionJPY(),
-                newFigurine.getDistributionMXN(),
-                newFigurine.getTamashiiUrl(),
-                newFigurine.getDistributionChannel(),
-                newFigurine.getLineUp(),
-                newFigurine.getSeries(),
-                newFigurine.getCategory(),
-                newFigurine.isRevival(),
-                newFigurine.isOce(),
-                newFigurine.isMetal(),
-                newFigurine.isGolden(),
-                newFigurine.isGold(),
-                newFigurine.isBroken(),
-                newFigurine.isPlain(),
-                newFigurine.isHk(),
-                newFigurine.isComic(),
-                newFigurine.isSet(),
-                newFigurine.getAnniversary(),
-                newFigurine.getRemarks()));
+    Figurine figurine =
+        new Figurine(
+            "1",
+            newFigurine.getBaseName(),
+            newFigurine.getDisplayableName(),
+            newFigurine.getLineUp(),
+            newFigurine.getSeries(),
+            newFigurine.getCategory(),
+            newFigurine.isRevival(),
+            newFigurine.isOce(),
+            newFigurine.isMetal(),
+            newFigurine.isGolden(),
+            newFigurine.isGold(),
+            newFigurine.isBroken(),
+            newFigurine.isPlain(),
+            newFigurine.isHk(),
+            newFigurine.isComic(),
+            newFigurine.isSet(),
+            newFigurine.getAnniversary(),
+            newFigurine.getRestocks());
+    figurine.setDistributionJPY(newFigurine.getDistributionJPY());
+    figurine.setDistributionMXN(newFigurine.getDistributionMXN());
+    figurine.setTamashiiUrl(newFigurine.getTamashiiUrl());
+    figurine.setDistributionChannel(newFigurine.getDistributionChannel());
+    figurine.setRemarks(newFigurine.getRemarks());
+
+    when(service.createFigurine(newFigurine)).thenReturn(figurine);
 
     mockMvc
         .perform(post(PATH).contentType(APPLICATION_JSON).content(payload))

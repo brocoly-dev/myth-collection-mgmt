@@ -1,9 +1,9 @@
 package com.mesofi.myth.collection.mgmt.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -14,12 +14,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Setter
 @Getter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "figurines")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Figurine {
+public class Figurine extends BaseFigurine {
   @Id private String id;
 
   @NotBlank
@@ -27,14 +27,6 @@ public class Figurine {
   private String baseName;
 
   private String displayableName; // This field is calculated ...
-
-  @Valid private Distribution distributionJPY;
-  @Valid private Distribution distributionMXN;
-
-  @Size(max = 35)
-  private String tamashiiUrl;
-
-  @Valid private DistributionChannel distributionChannel;
 
   private LineUp lineUp;
   private Series series;
@@ -52,5 +44,6 @@ public class Figurine {
   private boolean set;
 
   private Anniversary anniversary;
-  private String remarks;
+
+  private List<Restock> restocks; // This field is calculated
 }

@@ -33,52 +33,12 @@ public class MythCollectionServiceTest {
     // Arrange
     Figurine figurineToSave =
         new Figurine(
-            null,
-            "Seiya",
-            null,
-            null,
-            null,
-            "https://tamashiiweb.com/item/000",
-            null,
-            null,
-            null,
-            null,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            null,
-            null);
+            null, "Seiya", null, null, null, null, false, false, false, false, false, false, false,
+            false, false, false, null, null);
     Figurine savedFigurine =
         new Figurine(
-            "1",
-            "Seiya",
-            null,
-            null,
-            null,
-            "https://tamashiiweb.com/item/000",
-            null,
-            null,
-            null,
-            null,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            null,
-            null);
+            "1", "Seiya", null, null, null, null, false, false, false, false, false, false, false,
+            false, false, false, null, null);
     when(repository.save(figurineToSave)).thenReturn(savedFigurine);
 
     // Act
@@ -89,7 +49,6 @@ public class MythCollectionServiceTest {
     assertEquals("1", result.getId());
     assertEquals("Seiya", result.getBaseName());
     assertEquals("Seiya", result.getDisplayableName());
-    assertEquals("https://tamashiiweb.com/item/000", result.getTamashiiUrl());
     verify(repository, times(1)).save(figurineToSave);
   }
 
