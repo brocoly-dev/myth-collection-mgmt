@@ -20,7 +20,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "figurines")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Figurine extends BaseFigurine {
-  @Id private String id;
+  @EqualsAndHashCode.Exclude @Id private String id;
 
   @NotBlank
   @Size(min = 3, max = 20)
@@ -45,5 +45,5 @@ public class Figurine extends BaseFigurine {
 
   private Anniversary anniversary;
 
-  private List<Restock> restocks; // This field is calculated
+  @EqualsAndHashCode.Exclude private List<Restock> restocks; // This field is calculated
 }

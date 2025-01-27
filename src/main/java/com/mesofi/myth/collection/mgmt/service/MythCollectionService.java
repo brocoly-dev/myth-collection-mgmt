@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -48,7 +49,8 @@ public class MythCollectionService {
   public List<Figurine> getAllFigurines(boolean excludeRestocks) {
     log.info("Retrieving all the existing figurines ...");
 
-    List<Figurine> allFigurines = repository.findAll();
+    List<Figurine> allFigurines =
+        repository.findAll(Sort.by(Sort.Order.asc("distributionJPY.releaseDate")));
 
     List<Figurine> allFigurinesFiltered = new ArrayList<>();
     if (excludeRestocks) {

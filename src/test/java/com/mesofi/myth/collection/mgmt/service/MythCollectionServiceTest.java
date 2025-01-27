@@ -25,6 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 
 @ExtendWith(MockitoExtension.class)
 public class MythCollectionServiceTest {
@@ -69,7 +70,8 @@ public class MythCollectionServiceTest {
     figurine2.setCategory(Category.SCALE);
 
     // Arrange
-    when(repository.findAll()).thenReturn(List.of(figurine1, figurine2));
+    when(repository.findAll(Sort.by(Sort.Order.asc("distributionJPY.releaseDate"))))
+        .thenReturn(List.of(figurine1, figurine2));
 
     // Act
     List<Figurine> result = service.getAllFigurines(false);
@@ -77,14 +79,14 @@ public class MythCollectionServiceTest {
     // Assert
     assertNotNull(result);
     assertEquals(2, result.size());
-    assertEquals(result.get(0).getBaseName(), "Pegasus Seiya");
-    assertEquals(result.get(0).getDisplayableName(), "Pegasus Seiya");
-    assertNull(result.get(0).getRestocks());
+    assertEquals("Pegasus Seiya", result.getFirst().getBaseName());
+    assertEquals("Pegasus Seiya", result.getFirst().getDisplayableName());
+    assertNull(result.getFirst().getRestocks());
 
-    assertEquals(result.get(1).getBaseName(), "Sea Emperor");
-    assertEquals(result.get(1).getDisplayableName(), "Sea Emperor");
+    assertEquals("Sea Emperor", result.get(1).getBaseName());
+    assertEquals("Sea Emperor", result.get(1).getDisplayableName());
     assertNull(result.get(1).getRestocks());
-    verify(repository).findAll();
+    verify(repository).findAll(Sort.by(Sort.Order.asc("distributionJPY.releaseDate")));
   }
 
   @Test
@@ -99,7 +101,8 @@ public class MythCollectionServiceTest {
     figurine2.setCategory(Category.SCALE);
 
     // Arrange
-    when(repository.findAll()).thenReturn(List.of(figurine1, figurine2));
+    when(repository.findAll(Sort.by(Sort.Order.asc("distributionJPY.releaseDate"))))
+        .thenReturn(List.of(figurine1, figurine2));
 
     // Act
     List<Figurine> result = service.getAllFigurines(true);
@@ -107,17 +110,17 @@ public class MythCollectionServiceTest {
     // Assert
     assertNotNull(result);
     assertEquals(2, result.size());
-    assertEquals(result.get(0).getBaseName(), "Pegasus Seiya");
-    assertEquals(result.get(0).getDisplayableName(), "Pegasus Seiya");
-    assertEquals(result.get(0).getCategory(), Category.V1);
+    assertEquals("Pegasus Seiya", result.getFirst().getBaseName());
+    assertEquals("Pegasus Seiya", result.getFirst().getDisplayableName());
+    assertEquals(Category.V1, result.getFirst().getCategory());
     assertNull(result.get(0).getRestocks());
 
-    assertEquals(result.get(1).getBaseName(), "Sea Emperor");
-    assertEquals(result.get(1).getDisplayableName(), "Sea Emperor");
-    assertEquals(result.get(1).getCategory(), Category.SCALE);
+    assertEquals("Sea Emperor", result.get(1).getBaseName());
+    assertEquals("Sea Emperor", result.get(1).getDisplayableName());
+    assertEquals(Category.SCALE, result.get(1).getCategory());
     assertNull(result.get(1).getRestocks());
 
-    verify(repository).findAll();
+    verify(repository).findAll(Sort.by(Sort.Order.asc("distributionJPY.releaseDate")));
   }
 
   @Test
@@ -149,7 +152,8 @@ public class MythCollectionServiceTest {
     figurine2.setRemarks("some comment");
 
     // Arrange
-    when(repository.findAll()).thenReturn(List.of(figurine1, figurine2));
+    when(repository.findAll(Sort.by(Sort.Order.asc("distributionJPY.releaseDate"))))
+        .thenReturn(List.of(figurine1, figurine2));
 
     // Act
     List<Figurine> result = service.getAllFigurines(true);
@@ -157,22 +161,117 @@ public class MythCollectionServiceTest {
     // Assert
     assertNotNull(result);
     assertEquals(1, result.size());
-    assertEquals(result.get(0).getBaseName(), "Pegasus Seiya");
-    assertEquals(result.get(0).getDisplayableName(), "Pegasus Seiya");
-    assertEquals(result.get(0).getCategory(), Category.V1);
+    assertEquals("Pegasus Seiya", result.getFirst().getBaseName());
+    assertEquals("Pegasus Seiya", result.getFirst().getDisplayableName());
+    assertEquals(Category.V1, result.getFirst().getCategory());
 
-    List<Restock> restocks = result.get(0).getRestocks();
+    List<Restock> restocks = result.getFirst().getRestocks();
 
     assertNotNull(restocks);
     assertEquals(1, restocks.size());
-    assertEquals(distributionJPY, restocks.get(0).getDistributionJPY());
-    assertEquals(distributionMXN, restocks.get(0).getDistributionMXN());
-    assertEquals("https://tamashiiweb.com/item/1288", restocks.get(0).getTamashiiUrl());
+    assertEquals(distributionJPY, restocks.getFirst().getDistributionJPY());
+    assertEquals(distributionMXN, restocks.getFirst().getDistributionMXN());
+    assertEquals("https://tamashiiweb.com/item/1288", restocks.getFirst().getTamashiiUrl());
     assertEquals(
-        new DistributionChannel("123", "Stores"), restocks.get(0).getDistributionChannel());
-    assertEquals("some comment", restocks.get(0).getRemarks());
+        new DistributionChannel("123", "Stores"), restocks.getFirst().getDistributionChannel());
+    assertEquals("some comment", restocks.getFirst().getRemarks());
 
-    verify(repository).findAll();
+    verify(repository).findAll(Sort.by(Sort.Order.asc("distributionJPY.releaseDate")));
+  }
+
+  @Test
+  void getAllFigurines_whenMultipleFigurines_thenGetAllFigurinesWithoutRestocks() {
+    Figurine figurine1 = new Figurine();
+    figurine1.setId("1234567890");
+    figurine1.setBaseName("Aiolia Leo");
+    figurine1.setDistributionJPY(
+        new Distribution(
+            null,
+            new BigDecimal("8000"),
+            null,
+            null,
+            LocalDate.of(2017, 11, 28),
+            LocalDate.of(2018, 4, 28),
+            true));
+    figurine1.setTamashiiUrl("https://tamashiiweb.com/item/12395");
+    figurine1.setDistributionChannel(new DistributionChannel("123", "Stores"));
+    figurine1.setLineUp(LineUp.MYTH_CLOTH_EX);
+    figurine1.setSeries(Series.SAINT_SEIYA);
+    figurine1.setCategory(Category.GOLD);
+    figurine1.setRevival(true);
+
+    Figurine figurine2 = new Figurine();
+    figurine2.setId("1234567891");
+    figurine2.setBaseName("Aiolia Leo");
+    figurine2.setDistributionJPY(
+        new Distribution(
+            null,
+            new BigDecimal("15000"),
+            null,
+            LocalDate.of(2024, 2, 16),
+            LocalDate.of(2024, 1, 24),
+            LocalDate.of(2024, 1, 24),
+            true));
+    figurine2.setTamashiiUrl("https://tamashiiweb.com/item/14207");
+    figurine2.setDistributionChannel(new DistributionChannel("123", "Tamashii Store"));
+    figurine2.setLineUp(LineUp.MYTH_CLOTH_EX);
+    figurine2.setSeries(Series.SAINT_SEIYA);
+    figurine2.setCategory(Category.GOLD);
+    figurine2.setRevival(true);
+    figurine2.setRemarks("Sold via lottery from Jan 10 to Jan 16");
+
+    Figurine figurine3 = new Figurine();
+    figurine3.setId("1234567892");
+    figurine3.setBaseName("Eta Benetnasch Mime");
+    figurine3.setDistributionJPY(
+        new Distribution(null, null, null, LocalDate.of(2024, 11, 15), null, null, false));
+    figurine3.setLineUp(LineUp.MYTH_CLOTH_EX);
+    figurine3.setSeries(Series.SAINT_SEIYA);
+    figurine3.setCategory(Category.ROBE);
+
+    // Arrange
+    when(repository.findAll(Sort.by(Sort.Order.asc("distributionJPY.releaseDate"))))
+        .thenReturn(List.of(figurine1, figurine2, figurine3));
+
+    // Act
+    List<Figurine> result = service.getAllFigurines(true);
+
+    // Assert
+    assertNotNull(result);
+    assertEquals(2, result.size());
+    assertEquals("1234567890", result.getFirst().getId());
+    assertEquals("Aiolia Leo", result.getFirst().getBaseName());
+    assertEquals("Aiolia Leo <Revival Ver.>", result.getFirst().getDisplayableName());
+    assertEquals("https://tamashiiweb.com/item/12395", result.getFirst().getTamashiiUrl());
+    assertEquals(LineUp.MYTH_CLOTH_EX, result.getFirst().getLineUp());
+    assertEquals(Series.SAINT_SEIYA, result.getFirst().getSeries());
+    assertEquals(Category.GOLD, result.getFirst().getCategory());
+
+    List<Restock> restocks = result.getFirst().getRestocks();
+
+    assertNotNull(restocks);
+    assertEquals(1, restocks.size());
+    assertEquals(new BigDecimal("15000"), restocks.getFirst().getDistributionJPY().getBasePrice());
+    assertEquals(
+        LocalDate.of(2024, 2, 16),
+        restocks.getFirst().getDistributionJPY().getFirstAnnouncementDate());
+    assertEquals(
+        LocalDate.of(2024, 1, 24), restocks.getFirst().getDistributionJPY().getPreOrderDate());
+    assertEquals(
+        LocalDate.of(2024, 1, 24), restocks.getFirst().getDistributionJPY().getReleaseDate());
+    assertEquals(true, restocks.getFirst().getDistributionJPY().getReleaseDateConfirmed());
+    assertEquals("https://tamashiiweb.com/item/14207", restocks.getFirst().getTamashiiUrl());
+    assertEquals("Sold via lottery from Jan 10 to Jan 16", restocks.getFirst().getRemarks());
+
+    assertEquals("1234567892", result.get(1).getId());
+    assertEquals("Eta Benetnasch Mime", result.get(1).getBaseName());
+    assertEquals("Eta Benetnasch Mime", result.get(1).getDisplayableName());
+    assertNull(result.get(1).getTamashiiUrl());
+    assertEquals(LineUp.MYTH_CLOTH_EX, result.get(1).getLineUp());
+    assertEquals(Series.SAINT_SEIYA, result.get(1).getSeries());
+    assertEquals(Category.ROBE, result.get(1).getCategory());
+
+    verify(repository).findAll(Sort.by(Sort.Order.asc("distributionJPY.releaseDate")));
   }
 
   @Test

@@ -13,13 +13,14 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BaseFigurine {
 
-  @Valid private Distribution distributionJPY;
-  @Valid private Distribution distributionMXN;
+  @EqualsAndHashCode.Exclude @Valid private Distribution distributionJPY;
+  @EqualsAndHashCode.Exclude @Valid private Distribution distributionMXN;
 
   @Size(max = 35)
+  @EqualsAndHashCode.Exclude
   private String tamashiiUrl;
 
-  @Valid private DistributionChannel distributionChannel;
+  @EqualsAndHashCode.Exclude @Valid private DistributionChannel distributionChannel;
 
-  private String remarks;
+  @EqualsAndHashCode.Exclude private String remarks;
 }
