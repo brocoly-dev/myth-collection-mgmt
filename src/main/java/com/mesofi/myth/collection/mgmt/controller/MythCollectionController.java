@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
@@ -32,6 +33,15 @@ public class MythCollectionController {
   public static final String MAPPING = "/figurines";
 
   private final MythCollectionService service;
+
+  @PostMapping("/upload")
+  public List<Figurine> uploadFigurines(@RequestParam("file") MultipartFile file) {
+
+    List<Figurine> figurineList = service.createFigurines(file);
+    log.info("{} figurines created ...", figurineList);
+
+    return figurineList;
+  }
 
   /**
    * Creates a new figurine.

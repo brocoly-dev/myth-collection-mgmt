@@ -1,26 +1,65 @@
 package com.mesofi.myth.collection.mgmt.service;
 
+import com.mesofi.myth.collection.mgmt.exceptions.SourceFigurineBulkException;
+import com.mesofi.myth.collection.mgmt.mappers.FigurineMapper;
 import com.mesofi.myth.collection.mgmt.model.Anniversary;
+import com.mesofi.myth.collection.mgmt.model.BaseFigurine;
 import com.mesofi.myth.collection.mgmt.model.Category;
+import com.mesofi.myth.collection.mgmt.model.Distribution;
 import com.mesofi.myth.collection.mgmt.model.Figurine;
 import com.mesofi.myth.collection.mgmt.model.LineUp;
 import com.mesofi.myth.collection.mgmt.model.Restock;
 import com.mesofi.myth.collection.mgmt.model.Series;
+import com.mesofi.myth.collection.mgmt.model.SourceFigurine;
 import com.mesofi.myth.collection.mgmt.repository.MythCollectionRepository;
+import com.opencsv.bean.CsvToBeanBuilder;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+/** Contains the main logic that handles the figurines. */
 @Slf4j
 @Service
 @AllArgsConstructor
 public class MythCollectionService {
 
   private final MythCollectionRepository repository;
+  private final FigurineMapper mapper;
+
+  /**
+   * Create a list of figurines based on the source file.
+   *
+   * @param file The file to be used as input.
+   * @return The list of figurines.
+   */
+  public List<Figurine> createFigurines(final MultipartFile file) {
+
+    try (Reader reader = new InputStreamReader(file.getInputStream())) {
+      // Use OpenCSV to parse the file and map each row to a SourceFigurine object
+      return new CsvToBeanBuilder<SourceFigurine>(reader)
+              .withType(SourceFigurine.class) // Specify the type of object to map to
+              .build()
+              .parse()
+              .stream()
+              .map(mapper::toFigure)
+              .peek(this::createFigurine)
+              .toList();
+    } catch (IOException e) {
+      throw new SourceFigurineBulkException("Unable to load figurines");
+    }
+  }
 
   /**
    * Creates a new figurine.
@@ -49,8 +88,30 @@ public class MythCollectionService {
   public List<Figurine> getAllFigurines(boolean excludeRestocks) {
     log.info("Retrieving all the existing figurines ...");
 
-    List<Figurine> allFigurines =
-        repository.findAll(Sort.by(Sort.Order.asc("distributionJPY.releaseDate")));
+    Sort sort = Sort.by(Sort.Order.asc("distributionJPY.releaseDate"));
+    List<Figurine> allFigurines = repository.findAll(sort);
+
+    Comparator<Figurine> ascComparator =
+        (f1, f2) -> {
+          if (geReleaseDate(f1).isPresent() && geReleaseDate(f2).isPresent()) {
+            return f1.getDistributionJPY()
+                .getReleaseDate()
+                .compareTo(f2.getDistributionJPY().getReleaseDate());
+          }
+          return 0;
+        };
+
+    Comparator<Figurine> descComparator =
+        (f1, f2) -> {
+          if (geReleaseDate(f1).isPresent() && geReleaseDate(f2).isPresent()) {
+            return f2.getDistributionJPY()
+                .getReleaseDate()
+                .compareTo(f1.getDistributionJPY().getReleaseDate());
+          }
+          return 0;
+        };
+
+    allFigurines.sort(ascComparator);
 
     List<Figurine> allFigurinesFiltered = new ArrayList<>();
     if (excludeRestocks) {
@@ -82,10 +143,17 @@ public class MythCollectionService {
     List<Figurine> existingFigurines =
         allFigurinesFiltered.stream()
             .peek(figurine -> figurine.setDisplayableName(calculateDisplayableName(figurine)))
-            .toList();
+            .collect(Collectors.toList());
 
     log.info("Found {} figurines", existingFigurines.size());
+    existingFigurines.sort(descComparator);
     return existingFigurines;
+  }
+
+  private Optional<LocalDate> geReleaseDate(Figurine figurine) {
+    return Optional.of(figurine)
+        .map(BaseFigurine::getDistributionJPY)
+        .map(Distribution::getReleaseDate);
   }
 
   /**
