@@ -17,6 +17,7 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.stereotype.Component;
@@ -85,6 +86,10 @@ public class FigurineMapper {
     figurine.setSet(toBoolean(catalog.getSet()));
 
     figurine.setAnniversary(toAnniversary(catalog.getAnniversary()));
+
+    figurine.setOfficialImages(toList(catalog.getOfficialImages()));
+    figurine.setOtherImages(toList(catalog.getOtherImages()));
+
     figurine.setRemarks(StringUtils.hasLength(catalog.getRemarks()) ? catalog.getRemarks() : null);
 
     if (isDistributionEmpty(figurine.getDistributionJPY())) {
@@ -94,6 +99,10 @@ public class FigurineMapper {
       figurine.setDistributionMXN(null);
     }
     return figurine;
+  }
+
+  private List<String> toList(String commaSeparatedItem) {
+    return commaSeparatedItem.isEmpty() ? null : Arrays.asList(commaSeparatedItem.split(","));
   }
 
   private Anniversary toAnniversary(String anniversary) {

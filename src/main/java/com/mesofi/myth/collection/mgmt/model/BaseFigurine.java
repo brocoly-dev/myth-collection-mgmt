@@ -3,6 +3,7 @@ package com.mesofi.myth.collection.mgmt.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,5 +23,7 @@ public class BaseFigurine {
 
   @EqualsAndHashCode.Exclude @Valid private DistributionChannel distributionChannel;
 
+  @EqualsAndHashCode.Exclude private List<String> officialImages;
+  @EqualsAndHashCode.Exclude private List<String> otherImages;
   @EqualsAndHashCode.Exclude private String remarks;
 }

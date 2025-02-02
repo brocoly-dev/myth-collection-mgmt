@@ -284,6 +284,7 @@ public class MythCollectionServiceTest {
     theFigurine = new Figurine();
     theFigurine.setBaseName("Phoenix Ikki");
     theFigurine.setCategory(Category.V2);
+    theFigurine.setLineUp(LineUp.MYTH_CLOTH_EX);
     theFigurine.setGolden(true);
     assertEquals(
         "Phoenix Ikki [New Bronze Cloth] ~Golden Limited Edition~",
@@ -427,6 +428,7 @@ public class MythCollectionServiceTest {
     theFigurine.setBaseName("Dragon Shiryu");
     theFigurine.setCategory(Category.V2);
     theFigurine.setGolden(true);
+    theFigurine.setLineUp(LineUp.MYTH_CLOTH_EX);
     assertEquals(
         "Dragon Shiryu [New Bronze Cloth] ~Golden Limited Edition~",
         service.calculateDisplayableName(theFigurine));
@@ -486,6 +488,11 @@ public class MythCollectionServiceTest {
     assertEquals(
         "Gemini Saga God Cloth Saga Saga Premium Set",
         service.calculateDisplayableName(theFigurine));
+
+    theFigurine = new Figurine();
+    theFigurine.setBaseName("Odin Aiolia");
+    theFigurine.setSeries(Series.SOG);
+    assertEquals("Odin Aiolia", service.calculateDisplayableName(theFigurine));
 
     theFigurine = new Figurine();
     theFigurine.setBaseName("Barlon Rene");
@@ -602,6 +609,19 @@ public class MythCollectionServiceTest {
         service.calculateDisplayableName(theFigurine));
 
     theFigurine = new Figurine();
+    theFigurine.setBaseName("Phoenix Ikki");
+    theFigurine.setCategory(Category.V2);
+    theFigurine.setLineUp(LineUp.MYTH_CLOTH_EX);
+    theFigurine.setBroken(true);
+    assertEquals("Phoenix Ikki [New Bronze Cloth]", service.calculateDisplayableName(theFigurine));
+
+    theFigurine = new Figurine();
+    theFigurine.setBaseName("God Pedestal");
+    theFigurine.setSeries(Series.SOG);
+    theFigurine.setSet(true);
+    assertEquals("God Pedestal Set", service.calculateDisplayableName(theFigurine));
+
+    theFigurine = new Figurine();
     theFigurine.setBaseName("Steel Saint Land Cloth Daichi & Steel Saint Marin Cloth Ushio");
     theFigurine.setCategory(Category.STEEL);
     theFigurine.setSet(true);
@@ -665,6 +685,17 @@ public class MythCollectionServiceTest {
         service.calculateDisplayableName(theFigurine));
 
     theFigurine = new Figurine();
+    theFigurine.setBaseName("Aries Shion");
+    theFigurine.setOce(true);
+    theFigurine.setHk(true);
+    theFigurine.setSet(true);
+    theFigurine.setCategory(Category.SURPLICE);
+    theFigurine.setLineUp(LineUp.MYTH_CLOTH);
+    assertEquals(
+        "Aries Shion & The Pope Set ~Asian Edition~",
+        service.calculateDisplayableName(theFigurine));
+
+    theFigurine = new Figurine();
     theFigurine.setBaseName("Pegasus Seiya");
     theFigurine.setGold(true);
     theFigurine.setLineUp(LineUp.MYTH_CLOTH);
@@ -674,5 +705,10 @@ public class MythCollectionServiceTest {
     theFigurine.setBaseName("Pegasus Seiya");
     theFigurine.setPlain(true);
     assertEquals("Pegasus Seiya (Plain Clothes)", service.calculateDisplayableName(theFigurine));
+
+    theFigurine = new Figurine();
+    theFigurine.setBaseName("Pegasus Seiya");
+    theFigurine.setCategory(Category.V2);
+    assertEquals("Pegasus Seiya", service.calculateDisplayableName(theFigurine));
   }
 }

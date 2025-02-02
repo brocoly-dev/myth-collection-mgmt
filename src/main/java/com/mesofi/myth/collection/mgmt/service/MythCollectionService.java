@@ -74,6 +74,8 @@ public class MythCollectionService {
 
     // Calculates additional information ...
     created.setDisplayableName(calculateDisplayableName(created));
+    created.setOfficialImages(complementImageUrls(created.getOfficialImages()));
+    created.setOtherImages(complementImageUrls(created.getOtherImages()));
 
     log.info("A new figure has been created with id: {}", created.getId());
     return created;
@@ -142,7 +144,12 @@ public class MythCollectionService {
 
     List<Figurine> existingFigurines =
         allFigurinesFiltered.stream()
-            .peek(figurine -> figurine.setDisplayableName(calculateDisplayableName(figurine)))
+            .peek(
+                figurine -> {
+                  figurine.setDisplayableName(calculateDisplayableName(figurine));
+                  figurine.setOfficialImages(complementImageUrls(figurine.getOfficialImages()));
+                  figurine.setOtherImages(complementImageUrls(figurine.getOtherImages()));
+                })
             .collect(Collectors.toList());
 
     log.info("Found {} figurines", existingFigurines.size());
@@ -156,6 +163,22 @@ public class MythCollectionService {
         .map(Distribution::getReleaseDate);
   }
 
+  public List<String> complementImageUrls(List<String> images) {
+    return Objects.isNull(images)
+        ? null
+        : images.stream()
+            .map(
+                img -> {
+                  final String URL = "https://imagizer.imageshack.com/v2/640x480q70/";
+                  if (img.contains("png")) {
+                    return URL + img;
+                  } else {
+                    return URL + img + ".jpg";
+                  }
+                })
+            .toList();
+  }
+
   /**
    * Calculates the displayable name based on the figure attributes.
    *
@@ -165,8 +188,17 @@ public class MythCollectionService {
   public String calculateDisplayableName(Figurine figurine) {
     final String MYSTERIOUS = "mysterious";
     final String JUMP = "jump";
+    final String SAGA = "saga";
 
     String name = figurine.getBaseName();
+
+    // very specific cases.
+    if (figurine.getBaseName().toLowerCase().contains("aries shion")
+        && figurine.isOce()
+        && figurine.isHk()
+        && figurine.isSet()) {
+      return name + " & The Pope Set ~Asian Edition~";
+    }
 
     if (figurine.isOce()) {
       if (Anniversary.A_40 != figurine.getAnniversary()) {
@@ -176,13 +208,15 @@ public class MythCollectionService {
       }
     }
     if (Category.V2 == figurine.getCategory()) {
-      if (figurine.isBroken()) {
+      if (figurine.isBroken() && LineUp.MYTH_CLOTH_EX != figurine.getLineUp()) {
         name += " (New Bronze Cloth) ~Broken Version~";
       } else {
         if (Anniversary.A_40 == figurine.getAnniversary()) {
           name += " (New Bronze Cloth)";
         } else {
-          name += " [New Bronze Cloth]";
+          if (LineUp.MYTH_CLOTH_EX == figurine.getLineUp()) {
+            name += " [New Bronze Cloth]";
+          }
         }
       }
     }
@@ -232,7 +266,11 @@ public class MythCollectionService {
       }
     }
     if (Series.SOG == figurine.getSeries()) {
-      name += " God Cloth";
+      if (!((figurine.isSet() && !figurine.getBaseName().toLowerCase().contains(SAGA))
+          || figurine.getBaseName().toLowerCase().contains("loki")
+          || figurine.getBaseName().toLowerCase().contains("odin"))) {
+        name += " God Cloth";
+      }
     }
     if (Series.SAINTIA_SHO == figurine.getSeries() && Category.GOLD == figurine.getCategory()) {
       name += " Saintia Sho Color Edition";
@@ -270,7 +308,10 @@ public class MythCollectionService {
         }
       }
       if (Series.SOG == figurine.getSeries()) {
-        name += " Saga Saga Premium Set";
+        if (figurine.getBaseName().toLowerCase().contains(SAGA)) {
+          name += " Saga Saga Premium";
+        }
+        name += " Set";
       }
       if (Category.SCALE == figurine.getCategory()) {
         name += " Imperial Throne Set";

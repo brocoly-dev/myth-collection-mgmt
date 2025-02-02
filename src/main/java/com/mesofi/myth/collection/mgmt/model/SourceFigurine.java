@@ -82,6 +82,12 @@ public class SourceFigurine {
   @CsvBindByName(column = "Anniversary")
   private String anniversary;
 
+  @CsvBindByName(column = "Official Images")
+  private String officialImages;
+
+  @CsvBindByName(column = "Other Images")
+  private String otherImages;
+
   @CsvBindByName(column = "Remarks")
   private String remarks;
 }
