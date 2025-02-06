@@ -163,6 +163,12 @@ public class MythCollectionService {
         .map(Distribution::getReleaseDate);
   }
 
+  /**
+   * Complement the image URL.
+   *
+   * @param images The image identifier.
+   * @return The image url.
+   */
   public List<String> complementImageUrls(List<String> images) {
     return Objects.isNull(images)
         ? null

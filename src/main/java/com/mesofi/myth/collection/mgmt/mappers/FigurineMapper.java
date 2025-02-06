@@ -20,6 +20,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -42,6 +43,7 @@ public class FigurineMapper {
   public FigurineMapper(
       DistributionChannelService distributionChannelService,
       DistributorService distributorService) {
+
     this.distributors = distributorService.getAllDistributors();
     this.distributionChannels = distributionChannelService.getAllDistributionChannels();
   }
@@ -102,11 +104,12 @@ public class FigurineMapper {
   }
 
   private List<String> toList(String commaSeparatedItem) {
+    commaSeparatedItem = Optional.ofNullable(commaSeparatedItem).orElse("");
     return commaSeparatedItem.isEmpty() ? null : Arrays.asList(commaSeparatedItem.split(","));
   }
 
   private Anniversary toAnniversary(String anniversary) {
-    return switch (anniversary) {
+    return switch (Optional.ofNullable(anniversary).orElse("")) {
       case "10" -> Anniversary.A_10;
       case "15" -> Anniversary.A_15;
       case "20" -> Anniversary.A_20;
@@ -122,7 +125,7 @@ public class FigurineMapper {
   }
 
   private Category toCategory(String group) {
-    return switch (group) {
+    return switch (Optional.ofNullable(group).orElse("")) {
       case "Bronze Saint V1" -> Category.V1;
       case "Bronze Saint V2" -> Category.V2;
       case "Bronze Saint V3" -> Category.V3;
@@ -145,7 +148,7 @@ public class FigurineMapper {
   }
 
   private LineUp toLineUp(String lineUp) {
-    return switch (lineUp) {
+    return switch (Optional.ofNullable(lineUp).orElse("")) {
       case "Myth Cloth EX" -> LineUp.MYTH_CLOTH_EX;
       case "Myth Cloth" -> LineUp.MYTH_CLOTH;
       case "Appendix" -> LineUp.APPENDIX;
@@ -159,7 +162,7 @@ public class FigurineMapper {
   }
 
   private Series toSeries(String series) {
-    return switch (series) {
+    return switch (Optional.ofNullable(series).orElse("")) {
       case "Saint Seiya" -> Series.SAINT_SEIYA;
       case "Saintia Sho" -> Series.SAINTIA_SHO;
       case "Soul of Gold" -> Series.SOG;
@@ -187,19 +190,17 @@ public class FigurineMapper {
   }
 
   private boolean isDistributionEmpty(Distribution distribution) {
-    if (Objects.isNull(distribution)) {
-      return true;
-    } else {
-      return Objects.isNull(distribution.getDistributor())
-          && Objects.isNull(distribution.getBasePrice())
-          && Objects.isNull(distribution.getFirstAnnouncementDate())
-          && Objects.isNull(distribution.getPreOrderDate())
-          && Objects.isNull(distribution.getReleaseDate())
-          && Objects.isNull(distribution.getReleaseDateConfirmed());
-    }
+    return Objects.isNull(distribution)
+        || Objects.isNull(distribution.getDistributor())
+            && Objects.isNull(distribution.getBasePrice())
+            && Objects.isNull(distribution.getFirstAnnouncementDate())
+            && Objects.isNull(distribution.getPreOrderDate())
+            && Objects.isNull(distribution.getReleaseDate())
+            && Objects.isNull(distribution.getReleaseDateConfirmed());
   }
 
   private Boolean isConfirmed(String date) {
+    date = Optional.ofNullable(date).orElse("");
     if (date.isEmpty()) {
       return null;
     } else {
@@ -208,12 +209,14 @@ public class FigurineMapper {
   }
 
   private BigDecimal toBigDecimal(String amount) {
+    amount = Optional.ofNullable(amount).orElse("");
     return (amount.isEmpty() || amount.equals("¥0"))
         ? null
         : new BigDecimal(amount.substring(1).replaceAll(",", ""));
   }
 
   private LocalDate toLocalDate(String date) {
+    date = Optional.ofNullable(date).orElse("");
     return date.isEmpty() ? null : tryParse(date);
   }
 

@@ -9,8 +9,16 @@ import org.springframework.core.io.ClassPathResource;
 public class TestUtils {
 
   public static String loadPayload(String fileName) {
+    return loadRegularFile("payloads", fileName);
+  }
+
+  public static String loadFigurines(String fileName) {
+    return loadRegularFile("figurines", fileName);
+  }
+
+  private static String loadRegularFile(String folderName, String fileName) {
     try {
-      return new ClassPathResource("payloads/" + fileName)
+      return new ClassPathResource(folderName + "/" + fileName)
           .getContentAsString(Charset.defaultCharset());
     } catch (IOException e) {
       throw new IllegalArgumentException("Unable to load file", e);
