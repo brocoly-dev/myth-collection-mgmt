@@ -359,7 +359,6 @@ public class FigurineMapperTest {
     assertNotNull(result.getDistributionJPY());
     assertEquals(new BigDecimal("15400"), result.getDistributionJPY().getBasePrice());
     assertNull(result.getDistributionJPY().getDistributor());
-    assertNull(result.getDistributionJPY().getFinalPrice());
     assertEquals(
         LocalDate.of(2024, 04, 21), result.getDistributionJPY().getFirstAnnouncementDate());
     assertEquals(LocalDate.of(2024, 04, 26), result.getDistributionJPY().getPreOrderDate());
@@ -370,7 +369,6 @@ public class FigurineMapperTest {
     assertNotNull(result.getDistributionMXN().getDistributor());
     assertEquals("1", result.getDistributionMXN().getDistributor().getId());
     assertEquals("DAM", result.getDistributionMXN().getDistributor().getName());
-    assertNull(result.getDistributionMXN().getFinalPrice());
     assertNull(result.getDistributionMXN().getFirstAnnouncementDate());
     assertEquals(LocalDate.of(2024, 10, 29), result.getDistributionMXN().getPreOrderDate());
     assertEquals(LocalDate.of(2024, 11, 25), result.getDistributionMXN().getReleaseDate());

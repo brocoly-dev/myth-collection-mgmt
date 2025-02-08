@@ -15,7 +15,9 @@ import com.opencsv.bean.CsvToBeanBuilder;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.chrono.ChronoLocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -141,6 +143,16 @@ public class MythCollectionService {
    */
   private void populateAdditionalInfo(Figurine figurine) {
     figurine.setDisplayableName(calculateDisplayableName(figurine));
+
+    Distribution distJPY = figurine.getDistributionJPY();
+    Optional.ofNullable(distJPY)
+        .ifPresent(
+            $ -> {
+              if (Objects.nonNull($.getBasePrice())) {
+                distJPY.setFinalPrice(calculateFinalPrice($.getBasePrice(), $.getReleaseDate()));
+              }
+            });
+
     figurine.setOfficialImages(complementImageUrls(figurine.getOfficialImages()));
     figurine.setOtherImages(complementImageUrls(figurine.getOtherImages()));
   }
@@ -175,6 +187,30 @@ public class MythCollectionService {
                   }
                 })
             .toList();
+  }
+
+  /**
+   * Based on the base price and the release date, calculates the final price for the Japan
+   * figurines.
+   *
+   * @param basePrice The base price.
+   * @param releaseDate The release date.
+   * @return The final price for the figurine.
+   */
+  private BigDecimal calculateFinalPrice(BigDecimal basePrice, LocalDate releaseDate) {
+    ChronoLocalDate april1997 = LocalDate.of(1997, 4, 1);
+    ChronoLocalDate april2014 = LocalDate.of(2014, 4, 1);
+    ChronoLocalDate october2019 = LocalDate.of(2019, 10, 1);
+
+    String rate;
+    if (releaseDate.isAfter(april1997) && releaseDate.isBefore(april2014)) {
+      rate = ".05"; // 5%
+    } else if (releaseDate.isAfter(april2014) && releaseDate.isBefore(october2019)) {
+      rate = ".08"; // 8%
+    } else {
+      rate = ".1"; // 10%
+    }
+    return basePrice.add(basePrice.multiply(new BigDecimal(rate)));
   }
 
   /**

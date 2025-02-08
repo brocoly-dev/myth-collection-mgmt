@@ -205,6 +205,7 @@ public class MythCollectionServiceTest {
 
     Distribution distributionJPY = new Distribution();
     distributionJPY.setBasePrice(new BigDecimal("12000"));
+    distributionJPY.setReleaseDate(LocalDate.of(2025, 11, 2));
 
     Distribution distributionMXN = new Distribution();
     distributionMXN.setDistributor(new Distributor("123", "DAM"));
@@ -418,6 +419,67 @@ public class MythCollectionServiceTest {
 
     assertEquals("Leo", result.get(5).getBaseName());
     assertEquals(LocalDate.of(2025, 2, 1), result.get(5).getDistributionJPY().getReleaseDate());
+
+    verify(repository).findAll(Sort.by(Sort.Order.asc("distributionJPY.releaseDate")));
+  }
+
+  @Test
+  void getAllFigurines_whenMultipleFigurines_thenCalculateFinalPrice() {
+    Figurine figurine1 = new Figurine(); // no distributionJPY
+    figurine1.setBaseName("Seiya");
+
+    Figurine figurine2 = new Figurine();
+    figurine2.setBaseName("Shiryu");
+    figurine2.setDistributionJPY(
+        new Distribution(null, null, null, null, null, null, null)); // no basePrice
+
+    Figurine figurine3 = new Figurine();
+    figurine3.setBaseName("Hyoga");
+    figurine3.setDistributionJPY(
+        new Distribution(
+            null, new BigDecimal("4000"), null, null, null, LocalDate.of(1995, 1, 1), null));
+
+    Figurine figurine4 = new Figurine();
+    figurine4.setBaseName("Hyoga");
+    figurine4.setDistributionJPY(
+        new Distribution(
+            null, new BigDecimal("4000"), null, null, null, LocalDate.of(2003, 1, 1), null));
+
+    Figurine figurine5 = new Figurine();
+    figurine5.setBaseName("Hyoga");
+    figurine5.setDistributionJPY(
+        new Distribution(
+            null, new BigDecimal("4000"), null, null, null, LocalDate.of(2015, 1, 1), null));
+
+    Figurine figurine6 = new Figurine();
+    figurine6.setBaseName("Hyoga");
+    figurine6.setDistributionJPY(
+        new Distribution(
+            null, new BigDecimal("4000"), null, null, null, LocalDate.of(2020, 1, 1), null));
+
+    // Arrange
+    List<Figurine> list = new ArrayList<>();
+    list.add(figurine1);
+    list.add(figurine2);
+    list.add(figurine3);
+    list.add(figurine4);
+    list.add(figurine5);
+    list.add(figurine6);
+
+    Sort sort = Sort.by(Sort.Order.asc("distributionJPY.releaseDate"));
+    when(repository.findAll(sort)).thenReturn(list);
+
+    // Act
+    List<Figurine> result = service.getAllFigurines(false);
+
+    // Assert
+    assertEquals(6, result.size());
+    assertNull(result.getFirst().getDistributionJPY());
+    assertNull(result.get(1).getDistributionJPY().getFinalPrice());
+    assertEquals(new BigDecimal("4400.0"), result.get(2).getDistributionJPY().getFinalPrice());
+    assertEquals(new BigDecimal("4320.00"), result.get(3).getDistributionJPY().getFinalPrice());
+    assertEquals(new BigDecimal("4200.00"), result.get(4).getDistributionJPY().getFinalPrice());
+    assertEquals(new BigDecimal("4400.0"), result.get(5).getDistributionJPY().getFinalPrice());
 
     verify(repository).findAll(Sort.by(Sort.Order.asc("distributionJPY.releaseDate")));
   }
