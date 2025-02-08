@@ -17,7 +17,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -92,16 +91,6 @@ public class MythCollectionService {
     Sort sort = Sort.by(Sort.Order.asc("distributionJPY.releaseDate"));
     List<Figurine> allFigurines = repository.findAll(sort);
 
-    Comparator<Figurine> descComparator =
-        (f1, f2) -> {
-          if (geReleaseDate(f1).isPresent() && geReleaseDate(f2).isPresent()) {
-            return f2.getDistributionJPY()
-                .getReleaseDate()
-                .compareTo(f1.getDistributionJPY().getReleaseDate());
-          }
-          return 0;
-        };
-
     List<Figurine> allFigurinesFiltered = new ArrayList<>();
     if (excludeRestocks) {
       for (Figurine currFigurine : allFigurines) {
@@ -137,10 +126,18 @@ public class MythCollectionService {
                   figurine.setOfficialImages(complementImageUrls(figurine.getOfficialImages()));
                   figurine.setOtherImages(complementImageUrls(figurine.getOtherImages()));
                 })
+            .sorted(
+                (f1, f2) -> {
+                  if (geReleaseDate(f1).isPresent() && geReleaseDate(f2).isPresent()) {
+                    return f2.getDistributionJPY()
+                        .getReleaseDate()
+                        .compareTo(f1.getDistributionJPY().getReleaseDate());
+                  }
+                  return 0;
+                })
             .collect(Collectors.toList());
 
     log.info("Found {} figurines", existingFigurines.size());
-    existingFigurines.sort(descComparator);
     return existingFigurines;
   }
 
