@@ -1,26 +1,65 @@
 package com.mesofi.myth.collection.mgmt.service;
 
+import com.mesofi.myth.collection.mgmt.exceptions.SourceFigurineBulkException;
+import com.mesofi.myth.collection.mgmt.mappers.FigurineMapper;
 import com.mesofi.myth.collection.mgmt.model.Anniversary;
 import com.mesofi.myth.collection.mgmt.model.Category;
+import com.mesofi.myth.collection.mgmt.model.Distribution;
 import com.mesofi.myth.collection.mgmt.model.Figurine;
 import com.mesofi.myth.collection.mgmt.model.LineUp;
 import com.mesofi.myth.collection.mgmt.model.Restock;
 import com.mesofi.myth.collection.mgmt.model.Series;
+import com.mesofi.myth.collection.mgmt.model.SourceFigurine;
 import com.mesofi.myth.collection.mgmt.repository.MythCollectionRepository;
+import com.opencsv.bean.CsvToBeanBuilder;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.chrono.ChronoLocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+/** Contains the main logic that handles the figurines. */
 @Slf4j
 @Service
 @AllArgsConstructor
 public class MythCollectionService {
 
   private final MythCollectionRepository repository;
+  private final FigurineMapper mapper;
+
+  /**
+   * Create a list of figurines based on the source file.
+   *
+   * @param file The file to be used as input.
+   * @return The list of figurines.
+   */
+  public List<Figurine> createFigurines(final MultipartFile file) {
+
+    try (Reader reader = new InputStreamReader(file.getInputStream())) {
+      // Use OpenCSV to parse the file and map each row to a SourceFigurine object
+      return new CsvToBeanBuilder<SourceFigurine>(reader)
+              .withType(SourceFigurine.class) // Specify the type of object to map to
+              .build()
+              .parse()
+              .stream()
+              .map(mapper::toFigure)
+              .peek(this::createFigurine)
+              .toList();
+    } catch (IOException e) {
+      throw new SourceFigurineBulkException("Unable to load figurines");
+    }
+  }
 
   /**
    * Creates a new figurine.
@@ -29,12 +68,12 @@ public class MythCollectionService {
    * @return The figurine created in the DB.
    */
   public Figurine createFigurine(final Figurine figurine) {
-    log.info("A new figure is about to be created ...");
+    log.info("A new figure is about to be created with name [{}] ...", figurine.getBaseName());
 
     Figurine created = repository.save(figurine);
 
     // Calculates additional information ...
-    created.setDisplayableName(calculateDisplayableName(created));
+    populateAdditionalInfo(created);
 
     log.info("A new figure has been created with id: {}", created.getId());
     return created;
@@ -49,8 +88,8 @@ public class MythCollectionService {
   public List<Figurine> getAllFigurines(boolean excludeRestocks) {
     log.info("Retrieving all the existing figurines ...");
 
-    List<Figurine> allFigurines =
-        repository.findAll(Sort.by(Sort.Order.asc("distributionJPY.releaseDate")));
+    Sort sort = Sort.by(Sort.Order.asc("distributionJPY.releaseDate"));
+    List<Figurine> allFigurines = repository.findAll(sort);
 
     List<Figurine> allFigurinesFiltered = new ArrayList<>();
     if (excludeRestocks) {
@@ -81,11 +120,97 @@ public class MythCollectionService {
 
     List<Figurine> existingFigurines =
         allFigurinesFiltered.stream()
-            .peek(figurine -> figurine.setDisplayableName(calculateDisplayableName(figurine)))
-            .toList();
+            .peek(this::populateAdditionalInfo)
+            .sorted(
+                (f1, f2) -> {
+                  if (geReleaseDate(f1).isPresent() && geReleaseDate(f2).isPresent()) {
+                    return f2.getDistributionJPY()
+                        .getReleaseDate()
+                        .compareTo(f1.getDistributionJPY().getReleaseDate());
+                  }
+                  return 0;
+                })
+            .collect(Collectors.toList());
 
     log.info("Found {} figurines", existingFigurines.size());
     return existingFigurines;
+  }
+
+  /**
+   * Populates additional information for the figurine.
+   *
+   * @param figurine The figurine.
+   */
+  private void populateAdditionalInfo(Figurine figurine) {
+    figurine.setDisplayableName(calculateDisplayableName(figurine));
+
+    Distribution distJPY = figurine.getDistributionJPY();
+    Optional.ofNullable(distJPY)
+        .ifPresent(
+            $ -> {
+              if (Objects.nonNull($.getBasePrice())) {
+                distJPY.setFinalPrice(calculateFinalPrice($.getBasePrice(), $.getReleaseDate()));
+              }
+            });
+
+    figurine.setOfficialImages(complementImageUrls(figurine.getOfficialImages()));
+    figurine.setOtherImages(complementImageUrls(figurine.getOtherImages()));
+  }
+
+  /**
+   * Gets the release date, if the release date is not found, then it gets an empty reference.
+   *
+   * @param figurine The figurine.
+   * @return The release date or empty if it was not found.
+   */
+  private Optional<LocalDate> geReleaseDate(Figurine figurine) {
+    return Optional.ofNullable(figurine.getDistributionJPY()).map(Distribution::getReleaseDate);
+  }
+
+  /**
+   * Complement the image URL.
+   *
+   * @param images The image identifier.
+   * @return The image URL.
+   */
+  public List<String> complementImageUrls(List<String> images) {
+    return Objects.isNull(images)
+        ? null
+        : images.stream()
+            .map(
+                img -> {
+                  final String URL = "https://imagizer.imageshack.com/v2/640x480q70/";
+                  if (img.contains("png")) {
+                    return URL + img;
+                  } else {
+                    return URL + img + ".jpg";
+                  }
+                })
+            .toList();
+  }
+
+  /**
+   * Based on the base price and the release date, calculates the final price for the Japan
+   * figurines.
+   *
+   * @param basePrice The base price.
+   * @param releaseDate The release date.
+   * @return The final price for the figurine.
+   */
+  private BigDecimal calculateFinalPrice(BigDecimal basePrice, LocalDate releaseDate) {
+    ChronoLocalDate april1997 = LocalDate.of(1997, 4, 1);
+    ChronoLocalDate april2014 = LocalDate.of(2014, 4, 1);
+    ChronoLocalDate october2019 = LocalDate.of(2019, 10, 1);
+
+    String rate;
+    if (releaseDate.isAfter(april1997) && releaseDate.isBefore(april2014)) {
+      rate = ".05"; // 5%
+    } else if (releaseDate.isAfter(april2014) && releaseDate.isBefore(october2019)) {
+      rate = ".08"; // 8%
+    } else {
+      rate = ".1"; // 10%
+    }
+    return basePrice.add(basePrice.multiply(new BigDecimal(rate)));
   }
 
   /**
@@ -97,8 +222,17 @@ public class MythCollectionService {
   public String calculateDisplayableName(Figurine figurine) {
     final String MYSTERIOUS = "mysterious";
     final String JUMP = "jump";
+    final String SAGA = "saga";
 
     String name = figurine.getBaseName();
+
+    // very specific cases.
+    if (figurine.getBaseName().toLowerCase().contains("aries shion")
+        && figurine.isOce()
+        && figurine.isHk()
+        && figurine.isSet()) {
+      return name + " & The Pope Set ~Asian Edition~";
+    }
 
     if (figurine.isOce()) {
       if (Anniversary.A_40 != figurine.getAnniversary()) {
@@ -108,13 +242,15 @@ public class MythCollectionService {
       }
     }
     if (Category.V2 == figurine.getCategory()) {
-      if (figurine.isBroken()) {
+      if (figurine.isBroken() && LineUp.MYTH_CLOTH_EX != figurine.getLineUp()) {
         name += " (New Bronze Cloth) ~Broken Version~";
       } else {
         if (Anniversary.A_40 == figurine.getAnniversary()) {
           name += " (New Bronze Cloth)";
         } else {
-          name += " [New Bronze Cloth]";
+          if (LineUp.MYTH_CLOTH_EX == figurine.getLineUp()) {
+            name += " [New Bronze Cloth]";
+          }
         }
       }
     }
@@ -164,7 +300,11 @@ public class MythCollectionService {
       }
     }
     if (Series.SOG == figurine.getSeries()) {
-      name += " God Cloth";
+      if (!((figurine.isSet() && !figurine.getBaseName().toLowerCase().contains(SAGA))
+          || figurine.getBaseName().toLowerCase().contains("loki")
+          || figurine.getBaseName().toLowerCase().contains("odin"))) {
+        name += " God Cloth";
+      }
     }
     if (Series.SAINTIA_SHO == figurine.getSeries() && Category.GOLD == figurine.getCategory()) {
       name += " Saintia Sho Color Edition";
@@ -202,7 +342,10 @@ public class MythCollectionService {
         }
       }
       if (Series.SOG == figurine.getSeries()) {
-        name += " Saga Saga Premium Set";
+        if (figurine.getBaseName().toLowerCase().contains(SAGA)) {
+          name += " Saga Saga Premium";
+        }
+        name += " Set";
       }
       if (Category.SCALE == figurine.getCategory()) {
         name += " Imperial Throne Set";

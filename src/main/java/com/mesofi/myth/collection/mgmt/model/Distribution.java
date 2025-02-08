@@ -20,7 +20,7 @@ import lombok.Setter;
 public class Distribution {
   @Valid private Distributor distributor;
   @NotNull private BigDecimal basePrice;
-  private BigDecimal finalPrice;
+  private BigDecimal finalPrice; // This field is calculated ...
   private LocalDate firstAnnouncementDate;
   @NotNull private LocalDate preOrderDate;
   @NotNull private LocalDate releaseDate;
