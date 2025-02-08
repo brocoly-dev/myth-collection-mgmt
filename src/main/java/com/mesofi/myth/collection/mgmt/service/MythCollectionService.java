@@ -71,9 +71,7 @@ public class MythCollectionService {
     Figurine created = repository.save(figurine);
 
     // Calculates additional information ...
-    created.setDisplayableName(calculateDisplayableName(created));
-    created.setOfficialImages(complementImageUrls(created.getOfficialImages()));
-    created.setOtherImages(complementImageUrls(created.getOtherImages()));
+    populateAdditionalInfo(created);
 
     log.info("A new figure has been created with id: {}", created.getId());
     return created;
@@ -120,12 +118,7 @@ public class MythCollectionService {
 
     List<Figurine> existingFigurines =
         allFigurinesFiltered.stream()
-            .peek(
-                figurine -> {
-                  figurine.setDisplayableName(calculateDisplayableName(figurine));
-                  figurine.setOfficialImages(complementImageUrls(figurine.getOfficialImages()));
-                  figurine.setOtherImages(complementImageUrls(figurine.getOtherImages()));
-                })
+            .peek(this::populateAdditionalInfo)
             .sorted(
                 (f1, f2) -> {
                   if (geReleaseDate(f1).isPresent() && geReleaseDate(f2).isPresent()) {
@@ -141,6 +134,23 @@ public class MythCollectionService {
     return existingFigurines;
   }
 
+  /**
+   * Populates additional information for the figurine.
+   *
+   * @param figurine The figurine.
+   */
+  private void populateAdditionalInfo(Figurine figurine) {
+    figurine.setDisplayableName(calculateDisplayableName(figurine));
+    figurine.setOfficialImages(complementImageUrls(figurine.getOfficialImages()));
+    figurine.setOtherImages(complementImageUrls(figurine.getOtherImages()));
+  }
+
+  /**
+   * Gets the release date, if the release date is not found, then it gets an empty reference.
+   *
+   * @param figurine The figurine.
+   * @return The release date or empty if it was not found.
+   */
   private Optional<LocalDate> geReleaseDate(Figurine figurine) {
     return Optional.ofNullable(figurine.getDistributionJPY()).map(Distribution::getReleaseDate);
   }
@@ -149,7 +159,7 @@ public class MythCollectionService {
    * Complement the image URL.
    *
    * @param images The image identifier.
-   * @return The image url.
+   * @return The image URL.
    */
   public List<String> complementImageUrls(List<String> images) {
     return Objects.isNull(images)
