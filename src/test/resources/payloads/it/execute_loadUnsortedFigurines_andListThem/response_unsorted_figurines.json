@@ -1,0 +1,240 @@
+[
+    {
+        "baseName": "Libra Shiryu",
+        "displayableName": "Libra Shiryu ~Inheritor of the Gold Cloth~",
+        "lineUp": "MYTH_CLOTH_EX",
+        "series": "SAINT_SEIYA",
+        "category": "INHERITOR",
+        "revival": false,
+        "oce": false,
+        "metal": true,
+        "golden": false,
+        "gold": false,
+        "broken": false,
+        "plain": false,
+        "hk": false,
+        "comic": false,
+        "set": false
+    },
+    {
+        "baseName": "Epsilon Alioth Fenril",
+        "displayableName": "Epsilon Alioth Fenril",
+        "lineUp": "MYTH_CLOTH_EX",
+        "series": "SAINT_SEIYA",
+        "category": "ROBE",
+        "revival": false,
+        "oce": false,
+        "metal": false,
+        "golden": false,
+        "gold": false,
+        "broken": false,
+        "plain": false,
+        "hk": false,
+        "comic": false,
+        "set": false
+    },
+    {
+        "distributionJPY": {
+            "basePrice": 20000,
+            "releaseDate": "2007-12-06",
+            "releaseDateConfirmed": true
+        },
+        "tamashiiUrl": "https://tamashiiweb.com/item/799",
+        "officialImages": [
+            "https://imagizer.imageshack.com/v2/640x480q70/923/qIoyNi.jpg"
+        ],
+        "baseName": "Bronze Saint Five Warriors Gathered",
+        "displayableName": "Bronze Saint Five Warriors Gathered",
+        "lineUp": "MYTH_CLOTH",
+        "series": "SAINT_SEIYA",
+        "revival": false,
+        "oce": false,
+        "metal": false,
+        "golden": false,
+        "gold": false,
+        "broken": false,
+        "plain": false,
+        "hk": false,
+        "comic": false,
+        "set": false
+    },
+    {
+        "distributionJPY": {
+            "basePrice": 5000,
+            "releaseDate": "2007-11-17",
+            "releaseDateConfirmed": true
+        },
+        "officialImages": [
+            "https://imagizer.imageshack.com/v2/640x480q70/924/YVELzN.jpg"
+        ],
+        "baseName": "Master Crystal",
+        "displayableName": "Master Crystal",
+        "lineUp": "MYTH_CLOTH",
+        "series": "SAINT_SEIYA",
+        "category": "SILVER",
+        "revival": false,
+        "oce": false,
+        "metal": false,
+        "golden": false,
+        "gold": false,
+        "broken": false,
+        "plain": false,
+        "hk": false,
+        "comic": false,
+        "set": false
+    },
+    {
+        "distributionJPY": {
+            "basePrice": 4500,
+            "releaseDate": "2007-10-25",
+            "releaseDateConfirmed": true
+        },
+        "tamashiiUrl": "https://tamashiiweb.com/item/781",
+        "officialImages": [
+            "https://imagizer.imageshack.com/v2/640x480q70/924/oFKKNX.jpg"
+        ],
+        "baseName": "Chrysaor Krishna",
+        "displayableName": "Chrysaor Krishna",
+        "lineUp": "MYTH_CLOTH",
+        "series": "SAINT_SEIYA",
+        "category": "SCALE",
+        "revival": false,
+        "oce": false,
+        "metal": false,
+        "golden": false,
+        "gold": false,
+        "broken": false,
+        "plain": false,
+        "hk": false,
+        "comic": false,
+        "set": false
+    },
+    {
+        "distributionJPY": {
+            "basePrice": 4500,
+            "releaseDate": "2007-09-14",
+            "releaseDateConfirmed": true
+        },
+        "tamashiiUrl": "https://tamashiiweb.com/item/771",
+        "officialImages": [
+            "https://imagizer.imageshack.com/v2/640x480q70/922/BQ6vvM.jpg"
+        ],
+        "baseName": "Zeta Alcord Syd",
+        "displayableName": "Zeta Alcord Syd",
+        "lineUp": "MYTH_CLOTH",
+        "series": "SAINT_SEIYA",
+        "category": "ROBE",
+        "revival": false,
+        "oce": false,
+        "metal": false,
+        "golden": false,
+        "gold": false,
+        "broken": false,
+        "plain": false,
+        "hk": false,
+        "comic": false,
+        "set": false
+    },
+    {
+        "distributionJPY": {
+            "basePrice": 3500,
+            "releaseDate": "2007-09-10",
+            "releaseDateConfirmed": true
+        },
+        "officialImages": [
+            "https://imagizer.imageshack.com/v2/640x480q70/924/enwRvK.jpg"
+        ],
+        "baseName": "Hades Shun",
+        "displayableName": "Hades Shun",
+        "lineUp": "MYTH_CLOTH",
+        "series": "SAINT_SEIYA",
+        "revival": false,
+        "oce": false,
+        "metal": false,
+        "golden": false,
+        "gold": false,
+        "broken": false,
+        "plain": false,
+        "hk": false,
+        "comic": false,
+        "set": false
+    },
+    {
+        "distributionJPY": {
+            "basePrice": 1800,
+            "releaseDate": "2007-03-26",
+            "releaseDateConfirmed": true
+        },
+        "tamashiiUrl": "https://tamashiiweb.com/item/702",
+        "officialImages": [
+            "https://imagizer.imageshack.com/v2/640x480q70/924/jdGZW6.jpg"
+        ],
+        "baseName": "Pegasus Seiya",
+        "displayableName": "Pegasus Seiya [Final Bronze Cloth]",
+        "lineUp": "APPENDIX",
+        "series": "SAINT_SEIYA",
+        "category": "V3",
+        "revival": false,
+        "oce": false,
+        "metal": false,
+        "golden": false,
+        "gold": false,
+        "broken": false,
+        "plain": false,
+        "hk": false,
+        "comic": false,
+        "set": false
+    },
+    {
+        "distributionJPY": {
+            "basePrice": 5500,
+            "releaseDate": "2007-02-27",
+            "releaseDateConfirmed": true
+        },
+        "tamashiiUrl": "https://tamashiiweb.com/item/686",
+        "officialImages": [
+            "https://imagizer.imageshack.com/v2/640x480q70/924/j9i30o.jpg"
+        ],
+        "baseName": "Sea Dragon Kanon",
+        "displayableName": "Sea Dragon Kanon",
+        "lineUp": "MYTH_CLOTH",
+        "series": "SAINT_SEIYA",
+        "category": "SCALE",
+        "revival": false,
+        "oce": false,
+        "metal": false,
+        "golden": false,
+        "gold": false,
+        "broken": false,
+        "plain": false,
+        "hk": false,
+        "comic": false,
+        "set": false
+    },
+	{
+        "distributionJPY": {
+            "basePrice": 3600,
+            "releaseDate": "2003-12-01",
+            "releaseDateConfirmed": true
+        },
+        "tamashiiUrl": "https://tamashiiweb.com/item/237",
+        "officialImages": [
+            "https://imagizer.imageshack.com/v2/640x480q70/923/LXu9Mg.jpg"
+        ],
+        "baseName": "Pegasus Seiya",
+        "displayableName": "Pegasus Seiya",
+        "lineUp": "MYTH_CLOTH",
+        "series": "SAINT_SEIYA",
+        "category": "V2",
+        "revival": false,
+        "oce": false,
+        "metal": false,
+        "golden": false,
+        "gold": false,
+        "broken": false,
+        "plain": false,
+        "hk": false,
+        "comic": false,
+        "set": false
+    }
+]

@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,6 +39,51 @@ public class MythCollectionControllerTest {
   @MockitoBean private MythCollectionService service; // Mock the service layer
 
   private final String PATH = "/figurines";
+
+  @Test
+  void uploadFigurines_whenUploadingNewFigurines_thenReturnUploadedFigurines() throws Exception {
+    MockMultipartFile file =
+        new MockMultipartFile(
+            "file", // The name of the parameter in the form
+            "testfile.txt", // The original filename
+            null,
+            "This is a test file.".getBytes() // File content (byte array)
+            );
+
+    Figurine figurine1 = new Figurine();
+    figurine1.setBaseName("Seiya");
+    Figurine figurine2 = new Figurine();
+    figurine2.setBaseName("Shiryu");
+
+    when(service.createFigurines(file)).thenReturn(List.of(figurine1, figurine2));
+
+    mockMvc
+        .perform(multipart(PATH + "/upload").file(file))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].baseName").value("Seiya"))
+        .andExpect(jsonPath("$[0].revival").value(false))
+        .andExpect(jsonPath("$[0].oce").value(false))
+        .andExpect(jsonPath("$[0].metal").value(false))
+        .andExpect(jsonPath("$[0].golden").value(false))
+        .andExpect(jsonPath("$[0].gold").value(false))
+        .andExpect(jsonPath("$[0].broken").value(false))
+        .andExpect(jsonPath("$[0].plain").value(false))
+        .andExpect(jsonPath("$[0].hk").value(false))
+        .andExpect(jsonPath("$[0].comic").value(false))
+        .andExpect(jsonPath("$[0].set").value(false))
+        .andExpect(jsonPath("$[1].baseName").value("Shiryu"))
+        .andExpect(jsonPath("$[1].revival").value(false))
+        .andExpect(jsonPath("$[1].oce").value(false))
+        .andExpect(jsonPath("$[1].metal").value(false))
+        .andExpect(jsonPath("$[1].golden").value(false))
+        .andExpect(jsonPath("$[1].gold").value(false))
+        .andExpect(jsonPath("$[1].broken").value(false))
+        .andExpect(jsonPath("$[1].plain").value(false))
+        .andExpect(jsonPath("$[1].hk").value(false))
+        .andExpect(jsonPath("$[1].comic").value(false))
+        .andExpect(jsonPath("$[1].set").value(false));
+  }
 
   @Test
   void createFigurine_whenMissingPayload_thenReturnBadRequest() throws Exception {

@@ -38,7 +38,7 @@ public class MythCollectionController {
   public List<Figurine> uploadFigurines(@RequestParam("file") MultipartFile file) {
 
     List<Figurine> figurineList = service.createFigurines(file);
-    log.info("{} figurines created ...", figurineList);
+    log.info("{} figurines created ...", figurineList.size());
 
     return figurineList;
   }

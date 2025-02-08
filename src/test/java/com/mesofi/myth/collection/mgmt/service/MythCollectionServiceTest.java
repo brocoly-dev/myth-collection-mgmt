@@ -59,7 +59,7 @@ public class MythCollectionServiceTest {
   void createFigurines_whenBasicFigurines_thenLoadThemAll() {
     String figurines = loadFigurines("basic.csv");
 
-    MultipartFile file = new MockMultipartFile("file", "testfile.csv", null, figurines.getBytes());
+    MultipartFile file = new MockMultipartFile("file", "basic.csv", null, figurines.getBytes());
 
     Figurine figurine = new Figurine();
     figurine.setBaseName("Some Figurine");

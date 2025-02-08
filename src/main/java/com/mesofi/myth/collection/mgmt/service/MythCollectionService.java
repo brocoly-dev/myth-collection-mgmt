@@ -3,7 +3,6 @@ package com.mesofi.myth.collection.mgmt.service;
 import com.mesofi.myth.collection.mgmt.exceptions.SourceFigurineBulkException;
 import com.mesofi.myth.collection.mgmt.mappers.FigurineMapper;
 import com.mesofi.myth.collection.mgmt.model.Anniversary;
-import com.mesofi.myth.collection.mgmt.model.BaseFigurine;
 import com.mesofi.myth.collection.mgmt.model.Category;
 import com.mesofi.myth.collection.mgmt.model.Distribution;
 import com.mesofi.myth.collection.mgmt.model.Figurine;
@@ -68,7 +67,7 @@ public class MythCollectionService {
    * @return The figurine created in the DB.
    */
   public Figurine createFigurine(final Figurine figurine) {
-    log.info("A new figure is about to be created ...");
+    log.info("A new figure is about to be created with name [{}] ...", figurine.getBaseName());
 
     Figurine created = repository.save(figurine);
 
@@ -93,16 +92,6 @@ public class MythCollectionService {
     Sort sort = Sort.by(Sort.Order.asc("distributionJPY.releaseDate"));
     List<Figurine> allFigurines = repository.findAll(sort);
 
-    Comparator<Figurine> ascComparator =
-        (f1, f2) -> {
-          if (geReleaseDate(f1).isPresent() && geReleaseDate(f2).isPresent()) {
-            return f1.getDistributionJPY()
-                .getReleaseDate()
-                .compareTo(f2.getDistributionJPY().getReleaseDate());
-          }
-          return 0;
-        };
-
     Comparator<Figurine> descComparator =
         (f1, f2) -> {
           if (geReleaseDate(f1).isPresent() && geReleaseDate(f2).isPresent()) {
@@ -112,8 +101,6 @@ public class MythCollectionService {
           }
           return 0;
         };
-
-    allFigurines.sort(ascComparator);
 
     List<Figurine> allFigurinesFiltered = new ArrayList<>();
     if (excludeRestocks) {
@@ -158,9 +145,7 @@ public class MythCollectionService {
   }
 
   private Optional<LocalDate> geReleaseDate(Figurine figurine) {
-    return Optional.of(figurine)
-        .map(BaseFigurine::getDistributionJPY)
-        .map(Distribution::getReleaseDate);
+    return Optional.ofNullable(figurine.getDistributionJPY()).map(Distribution::getReleaseDate);
   }
 
   /**
