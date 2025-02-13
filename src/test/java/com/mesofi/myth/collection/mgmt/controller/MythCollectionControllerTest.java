@@ -566,6 +566,7 @@ public class MythCollectionControllerTest {
             newFigurine.getLineUp(),
             newFigurine.getSeries(),
             newFigurine.getCategory(),
+            newFigurine.getStatus(),
             newFigurine.isRevival(),
             newFigurine.isOce(),
             newFigurine.isMetal(),

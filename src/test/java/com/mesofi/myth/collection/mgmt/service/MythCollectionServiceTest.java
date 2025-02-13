@@ -22,10 +22,12 @@ import com.mesofi.myth.collection.mgmt.model.LineUp;
 import com.mesofi.myth.collection.mgmt.model.Restock;
 import com.mesofi.myth.collection.mgmt.model.Series;
 import com.mesofi.myth.collection.mgmt.model.SourceFigurine;
+import com.mesofi.myth.collection.mgmt.model.Status;
 import com.mesofi.myth.collection.mgmt.repository.MythCollectionRepository;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -82,15 +84,15 @@ public class MythCollectionServiceTest {
     // Arrange
     Figurine figurineToSave =
         new Figurine(
-            null, "Seiya", null, null, null, null, false, false, false, false, false, false, false,
-            false, false, false, null, null);
+            null, "Seiya", null, null, null, null, null, false, false, false, false, false, false,
+            false, false, false, false, null, null);
     figurineToSave.setOfficialImages(List.of("abc"));
     figurineToSave.setOtherImages(List.of("def"));
 
     Figurine savedFigurine =
         new Figurine(
-            "1", "Seiya", null, null, null, null, false, false, false, false, false, false, false,
-            false, false, false, null, null);
+            "1", "Seiya", null, null, null, null, null, false, false, false, false, false, false,
+            false, false, false, false, null, null);
     savedFigurine.setOfficialImages(List.of("abc"));
     savedFigurine.setOtherImages(List.of("def"));
 
@@ -480,6 +482,73 @@ public class MythCollectionServiceTest {
     assertEquals(new BigDecimal("4320.00"), result.get(3).getDistributionJPY().getFinalPrice());
     assertEquals(new BigDecimal("4200.00"), result.get(4).getDistributionJPY().getFinalPrice());
     assertEquals(new BigDecimal("4400.0"), result.get(5).getDistributionJPY().getFinalPrice());
+
+    verify(repository).findAll(Sort.by(Sort.Order.asc("distributionJPY.releaseDate")));
+  }
+
+  @Test
+  void getAllFigurines_whenMultipleFigurines_thenCalculateStatus() {
+    Figurine figurine1 = new Figurine();
+    figurine1.setBaseName("Seiya");
+
+    LocalDate announcementDate2 = LocalDate.now().minus(6, ChronoUnit.YEARS);
+    Figurine figurine2 = new Figurine();
+    figurine2.setBaseName("Shiryu");
+    figurine2.setDistributionJPY(
+        new Distribution(null, null, null, announcementDate2, null, null, null));
+
+    LocalDate announcementDate3 = LocalDate.now().minus(5, ChronoUnit.YEARS);
+    Figurine figurine3 = new Figurine();
+    figurine3.setBaseName("Hyoga");
+    figurine3.setDistributionJPY(
+        new Distribution(null, null, null, announcementDate3, null, null, null));
+
+    LocalDate announcementDate4 = LocalDate.now().minus(4, ChronoUnit.YEARS);
+    Figurine figurine4 = new Figurine();
+    figurine4.setBaseName("Hyoga");
+    figurine4.setDistributionJPY(
+        new Distribution(null, null, null, announcementDate4, null, null, null));
+
+    Figurine figurine5 = new Figurine();
+    figurine5.setBaseName("Shun");
+    figurine5.setDistributionJPY(
+        new Distribution(null, null, null, null, null, LocalDate.of(2003, 1, 1), true));
+
+    Figurine figurine6 = new Figurine();
+    figurine6.setBaseName("Ikki");
+    figurine6.setDistributionJPY(
+        new Distribution(null, null, null, null, null, LocalDate.of(2015, 1, 1), true));
+
+    Figurine figurine7 = new Figurine();
+    figurine7.setBaseName("Athena");
+    figurine7.setDistributionJPY(
+        new Distribution(null, null, null, null, null, LocalDate.of(2020, 1, 1), false));
+
+    // Arrange
+    List<Figurine> list = new ArrayList<>();
+    list.add(figurine1);
+    list.add(figurine2);
+    list.add(figurine3);
+    list.add(figurine4);
+    list.add(figurine5);
+    list.add(figurine6);
+    list.add(figurine7);
+
+    Sort sort = Sort.by(Sort.Order.asc("distributionJPY.releaseDate"));
+    when(repository.findAll(sort)).thenReturn(list);
+
+    // Act
+    List<Figurine> result = service.getAllFigurines(false);
+
+    // Assert
+    assertEquals(7, result.size());
+    assertEquals(Status.RELEASE_TBD, result.getFirst().getStatus());
+    assertEquals(Status.UNRELEASED, result.get(1).getStatus());
+    assertEquals(Status.PROTOTYPE, result.get(2).getStatus());
+    assertEquals(Status.PROTOTYPE, result.get(3).getStatus());
+    assertEquals(Status.FUTURE_RELEASE, result.get(4).getStatus());
+    assertEquals(Status.RELEASED, result.get(5).getStatus());
+    assertEquals(Status.RELEASED, result.get(6).getStatus());
 
     verify(repository).findAll(Sort.by(Sort.Order.asc("distributionJPY.releaseDate")));
   }

@@ -31,6 +31,7 @@ public class Figurine extends BaseFigurine {
   private LineUp lineUp;
   private Series series;
   private Category category;
+  private Status status; // This field is calculated ...
 
   private boolean revival;
   private boolean oce;

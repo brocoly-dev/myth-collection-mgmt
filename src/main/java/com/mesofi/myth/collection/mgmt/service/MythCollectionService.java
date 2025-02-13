@@ -10,6 +10,7 @@ import com.mesofi.myth.collection.mgmt.model.LineUp;
 import com.mesofi.myth.collection.mgmt.model.Restock;
 import com.mesofi.myth.collection.mgmt.model.Series;
 import com.mesofi.myth.collection.mgmt.model.SourceFigurine;
+import com.mesofi.myth.collection.mgmt.model.Status;
 import com.mesofi.myth.collection.mgmt.repository.MythCollectionRepository;
 import com.opencsv.bean.CsvToBeanBuilder;
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.chrono.ChronoLocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -153,8 +155,38 @@ public class MythCollectionService {
               }
             });
 
+    figurine.setStatus(calculateStatus(figurine));
+
     figurine.setOfficialImages(complementImageUrls(figurine.getOfficialImages()));
     figurine.setOtherImages(complementImageUrls(figurine.getOtherImages()));
+  }
+
+  private Status calculateStatus(Figurine figurine) {
+    Distribution jpy = figurine.getDistributionJPY();
+    LocalDate releaseDate = Optional.ofNullable(jpy).map(Distribution::getReleaseDate).orElse(null);
+    if (Objects.nonNull(releaseDate)) {
+      if (Objects.nonNull(jpy.getReleaseDateConfirmed())
+          && jpy.getReleaseDateConfirmed()
+          && releaseDate.isBefore(LocalDate.now())) {
+        return Status.RELEASED;
+      } else {
+        return Status.FUTURE_RELEASE;
+      }
+    } else {
+      LocalDate anncDate =
+          Optional.ofNullable(jpy).map(Distribution::getFirstAnnouncementDate).orElse(null);
+      if (Objects.nonNull(anncDate)) {
+        Period period = Period.between(anncDate, LocalDate.now());
+
+        if (period.getYears() > 5) {
+          return Status.UNRELEASED;
+        } else {
+          return Status.PROTOTYPE;
+        }
+      } else {
+        return Status.RELEASE_TBD;
+      }
+    }
   }
 
   /**
