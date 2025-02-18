@@ -166,6 +166,7 @@ public class MythCollectionIT {
   }
 
   @Test
+  @SuppressWarnings("null")
   void execute_CRUD_Distributor() {
     String request = loadPayload("it/execute_CRUD_Distributor/request_DTM.json");
     String response = loadPayload("it/execute_CRUD_Distributor/response_DTM.json");
@@ -246,6 +247,7 @@ public class MythCollectionIT {
   }
 
   @Test
+  @SuppressWarnings("null")
   void execute_CRUD_DistributionChannel() {
     String request =
         loadPayload("it/execute_CRUD_DistributionChannel/request_Tamashii_Nations.json");
