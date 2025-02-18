@@ -4,6 +4,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import com.mesofi.myth.collection.mgmt.exceptions.CatalogItemNotFoundException;
+import com.mesofi.myth.collection.mgmt.exceptions.FigurineNotFoundException;
 import com.mesofi.myth.collection.mgmt.model.ErrorDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -74,6 +75,15 @@ public class GlobalExceptionHandler {
       CatalogItemNotFoundException ex, HttpServletRequest request) {
     return createErrorDetails(
         NOT_FOUND, "The catalog for the given identifier was not found.", null, request);
+  }
+
+  // Handle the case where no resource is found for a URL (404 error)
+  @ExceptionHandler(FigurineNotFoundException.class)
+  @ResponseStatus(NOT_FOUND)
+  public ResponseEntity<ErrorDetails> handleHttpRequestFigurineNotFound(
+      FigurineNotFoundException ex, HttpServletRequest request) {
+    return createErrorDetails(
+        NOT_FOUND, "The figurine for the given identifier was not found.", null, request);
   }
 
   private ResponseEntity<ErrorDetails> createErrorDetails(

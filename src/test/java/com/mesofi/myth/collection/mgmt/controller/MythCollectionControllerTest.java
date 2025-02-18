@@ -12,11 +12,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.mesofi.myth.collection.mgmt.exceptions.FigurineNotFoundException;
 import com.mesofi.myth.collection.mgmt.model.Category;
 import com.mesofi.myth.collection.mgmt.model.Figurine;
 import com.mesofi.myth.collection.mgmt.service.MythCollectionService;
@@ -686,6 +688,79 @@ public class MythCollectionControllerTest {
   }
 
   @Test
+  void updateFigurine_whenSuccessPayload_thenReturnOk() throws Exception {
+    String id = "67ae35f52ddc1d63ac377354";
+    String payload = loadPayload("figurines/payload_success.json");
+
+    Figurine newFigurine = fromJsonToObject(Figurine.class, payload);
+
+    Figurine figurine =
+        new Figurine(
+            "1",
+            newFigurine.getBaseName(),
+            newFigurine.getDisplayableName(),
+            newFigurine.getLineUp(),
+            newFigurine.getSeries(),
+            newFigurine.getCategory(),
+            newFigurine.getStatus(),
+            newFigurine.isRevival(),
+            newFigurine.isOce(),
+            newFigurine.isMetal(),
+            newFigurine.isGolden(),
+            newFigurine.isGold(),
+            newFigurine.isBroken(),
+            newFigurine.isPlain(),
+            newFigurine.isHk(),
+            newFigurine.isComic(),
+            newFigurine.isSet(),
+            newFigurine.getAnniversary(),
+            newFigurine.getRestocks());
+    figurine.setDistributionJPY(newFigurine.getDistributionJPY());
+    figurine.setDistributionMXN(newFigurine.getDistributionMXN());
+    figurine.setTamashiiUrl(newFigurine.getTamashiiUrl());
+    figurine.setDistributionChannel(newFigurine.getDistributionChannel());
+    figurine.setRemarks(newFigurine.getRemarks());
+
+    when(service.updateFigurine(id, newFigurine)).thenReturn(figurine);
+
+    mockMvc
+        .perform(put(PATH + "/{id}", id).contentType(APPLICATION_JSON).content(payload))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value("1"))
+        .andExpect(jsonPath("$.baseName").value("Seiya"))
+        .andExpect(jsonPath("$.distributionJPY.basePrice").value(4500))
+        .andExpect(jsonPath("$.distributionJPY.preOrderDate").value("2024-10-02"))
+        .andExpect(jsonPath("$.distributionJPY.releaseDate").value("2024-10-02"))
+        .andExpect(jsonPath("$.distributionJPY.releaseDateConfirmed").value(true))
+        .andExpect(jsonPath("$.distributionMXN.distributor.id").value("1234567890"))
+        .andExpect(jsonPath("$.distributionMXN.distributor.name").value("DAM"))
+        .andExpect(jsonPath("$.distributionMXN.basePrice").value(4500))
+        .andExpect(jsonPath("$.distributionMXN.preOrderDate").value("2024-10-02"))
+        .andExpect(jsonPath("$.distributionMXN.releaseDate").value("2024-10-02"))
+        .andExpect(jsonPath("$.distributionMXN.releaseDateConfirmed").value(false))
+        .andExpect(jsonPath("$.tamashiiUrl").value("https://tamashiiweb.com/item/000"))
+        .andExpect(jsonPath("$.distributionChannel.id").value("1234567890"))
+        .andExpect(jsonPath("$.distributionChannel.distribution").value("Tamashii Store"))
+        .andExpect(jsonPath("$.lineUp").value("MYTH_CLOTH_EX"))
+        .andExpect(jsonPath("$.series").value("SAINT_SEIYA"))
+        .andExpect(jsonPath("$.revival").value(true))
+        .andExpect(jsonPath("$.oce").value(false))
+        .andExpect(jsonPath("$.metal").value(false))
+        .andExpect(jsonPath("$.golden").value(false))
+        .andExpect(jsonPath("$.gold").value(true))
+        .andExpect(jsonPath("$.broken").value(false))
+        .andExpect(jsonPath("$.plain").value(false))
+        .andExpect(jsonPath("$.hk").value(true))
+        .andExpect(jsonPath("$.comic").value(false))
+        .andExpect(jsonPath("$.set").value(false))
+        .andExpect(jsonPath("$.anniversary").value("A_20"))
+        .andExpect(jsonPath("$.remarks").value("Some Information\ngoes here"));
+
+    verify(service, times(1)).updateFigurine(id, figurine);
+  }
+
+  @Test
   void getAllFigurines_whenExistingFigurines_thenReturnOK() throws Exception {
     Figurine figurine1 = new Figurine();
     Figurine figurine2 = new Figurine();
@@ -730,5 +805,54 @@ public class MythCollectionControllerTest {
         .andExpect(jsonPath("$[1].set").value(false));
 
     verify(service, times(1)).getAllFigurines(false);
+  }
+
+  @Test
+  void getFigurine_whenInvalidFigurineId_thenReturnFigureNotFound() throws Exception {
+    String id = "invalid";
+
+    when(service.getFigurine(id)).thenThrow((FigurineNotFoundException.class));
+
+    mockMvc
+        .perform(get(PATH + "/{id}", id).contentType(APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.error").value("Not Found"))
+        .andExpect(jsonPath("$.messages").isArray())
+        .andExpect(jsonPath("$.messages", hasSize(1)))
+        .andExpect(
+            jsonPath("$.messages")
+                .value(hasItem("The figurine for the given identifier was not found.")))
+        .andExpect(jsonPath("$.path").value(PATH + "/invalid"));
+  }
+
+  @Test
+  void getFigurine_whenExistingFigurine_thenReturnOK() throws Exception {
+    String id = "67ae35f52ddc1d63ac377354";
+
+    Figurine figurine = new Figurine();
+    figurine.setBaseName("Pegasus Seiya");
+    figurine.setCategory(Category.V1);
+
+    when(service.getFigurine(id)).thenReturn(figurine);
+
+    mockMvc
+        .perform(get(PATH + "/{id}", id).contentType(APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.baseName").value("Pegasus Seiya"))
+        .andExpect(jsonPath("$.category").value("V1"))
+        .andExpect(jsonPath("$.revival").value(false))
+        .andExpect(jsonPath("$.oce").value(false))
+        .andExpect(jsonPath("$.metal").value(false))
+        .andExpect(jsonPath("$.golden").value(false))
+        .andExpect(jsonPath("$.gold").value(false))
+        .andExpect(jsonPath("$.broken").value(false))
+        .andExpect(jsonPath("$.plain").value(false))
+        .andExpect(jsonPath("$.hk").value(false))
+        .andExpect(jsonPath("$.comic").value(false))
+        .andExpect(jsonPath("$.set").value(false));
+
+    verify(service, times(1)).getFigurine(id);
   }
 }

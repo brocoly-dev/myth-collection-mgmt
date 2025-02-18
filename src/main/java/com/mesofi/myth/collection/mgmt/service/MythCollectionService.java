@@ -1,5 +1,6 @@
 package com.mesofi.myth.collection.mgmt.service;
 
+import com.mesofi.myth.collection.mgmt.exceptions.FigurineNotFoundException;
 import com.mesofi.myth.collection.mgmt.exceptions.SourceFigurineBulkException;
 import com.mesofi.myth.collection.mgmt.mappers.FigurineMapper;
 import com.mesofi.myth.collection.mgmt.model.Anniversary;
@@ -82,6 +83,55 @@ public class MythCollectionService {
   }
 
   /**
+   * Update an existing figurine.
+   *
+   * @param id The unique identifier for the figurine.
+   * @param figurine The updated figurine.
+   * @return The figurine.
+   */
+  public Figurine updateFigurine(String id, Figurine figurine) {
+    log.info("Existing figure to be update with id: [{}] ...", id);
+
+    Figurine existingFigurine =
+        repository
+            .findById(id)
+            .orElseThrow(() -> new FigurineNotFoundException("Figurine not found with id: " + id));
+
+    // Modify the document
+    existingFigurine.setBaseName(figurine.getBaseName());
+    existingFigurine.setLineUp(figurine.getLineUp());
+    existingFigurine.setSeries(figurine.getSeries());
+    existingFigurine.setCategory(figurine.getCategory());
+    existingFigurine.setRevival(figurine.isRevival());
+    existingFigurine.setOce(figurine.isOce());
+    existingFigurine.setMetal(figurine.isMetal());
+    existingFigurine.setGolden(figurine.isGolden());
+    existingFigurine.setGold(figurine.isGold());
+    existingFigurine.setBroken(figurine.isBroken());
+    existingFigurine.setPlain(figurine.isPlain());
+    existingFigurine.setHk(figurine.isHk());
+    existingFigurine.setComic(figurine.isComic());
+    existingFigurine.setSet(figurine.isSet());
+    existingFigurine.setAnniversary(figurine.getAnniversary());
+    existingFigurine.setDistributionJPY(figurine.getDistributionJPY());
+    existingFigurine.setDistributionMXN(figurine.getDistributionMXN());
+    existingFigurine.setTamashiiUrl(figurine.getTamashiiUrl());
+    existingFigurine.setDistributionChannel(figurine.getDistributionChannel());
+    existingFigurine.setOfficialImages(figurine.getOfficialImages());
+    existingFigurine.setOtherImages(figurine.getOtherImages());
+    existingFigurine.setRemarks(figurine.getRemarks());
+
+    // Save the updated document
+    Figurine updated = repository.save(existingFigurine);
+
+    // Calculates additional information ...
+    populateAdditionalInfo(updated);
+
+    log.info("Existing figure has been updated with id: {}", updated.getId());
+    return updated;
+  }
+
+  /**
    * Gets all the existing figurine.
    *
    * @param excludeRestocks Flag to exclude the restocks.
@@ -136,6 +186,20 @@ public class MythCollectionService {
 
     log.info("Found {} figurines", existingFigurines.size());
     return existingFigurines;
+  }
+
+  /**
+   * Get an existing figurine or an exception is thrown when it is not found.
+   *
+   * @param id The unique identifier.
+   * @return The figure.
+   */
+  public Figurine getFigurine(String id) {
+    log.info("Retrieving figure with id: [{}] ...", id);
+
+    return repository
+        .findById(id)
+        .orElseThrow(() -> new FigurineNotFoundException("Figurine not found with id: " + id));
   }
 
   /**

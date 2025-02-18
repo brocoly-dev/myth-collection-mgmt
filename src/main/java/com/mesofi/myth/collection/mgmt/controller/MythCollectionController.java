@@ -11,7 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -66,6 +68,21 @@ public class MythCollectionController {
   }
 
   /**
+   * Update an existing figurine.
+   *
+   * @param id Unique identifier for the figurine.
+   * @param figurine The figurine with updated information.
+   * @return The resulting figurine.
+   */
+  @PutMapping("/{id}")
+  public ResponseEntity<Figurine> updateFigurine(
+      @PathVariable String id, @RequestBody @Valid Figurine figurine) {
+
+    Figurine updatedFigurine = service.updateFigurine(id, figurine);
+    return ResponseEntity.ok(updatedFigurine);
+  }
+
+  /**
    * Retrieves all the existing figurines.
    *
    * @param excludeRestocks By default, the restocks are included in the list.
@@ -74,5 +91,16 @@ public class MythCollectionController {
   @GetMapping
   public List<Figurine> getAllFigurines(@RequestParam(required = false) boolean excludeRestocks) {
     return service.getAllFigurines(excludeRestocks);
+  }
+
+  /**
+   * Retrieves a single figure by its id.
+   *
+   * @param id The unique identifier.
+   * @return The figurine.
+   */
+  @GetMapping("/{id}")
+  public Figurine getFigurine(@PathVariable String id) {
+    return service.getFigurine(id);
   }
 }

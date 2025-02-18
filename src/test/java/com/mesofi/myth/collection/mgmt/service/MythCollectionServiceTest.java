@@ -5,11 +5,13 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.mesofi.myth.collection.mgmt.exceptions.FigurineNotFoundException;
 import com.mesofi.myth.collection.mgmt.exceptions.SourceFigurineBulkException;
 import com.mesofi.myth.collection.mgmt.mappers.FigurineMapper;
 import com.mesofi.myth.collection.mgmt.model.Anniversary;
@@ -27,9 +29,9 @@ import com.mesofi.myth.collection.mgmt.repository.MythCollectionRepository;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -115,6 +117,97 @@ public class MythCollectionServiceTest {
         "https://imagizer.imageshack.com/v2/640x480q70/def.jpg",
         result.getOtherImages().getFirst());
     verify(repository, times(1)).save(figurineToSave);
+  }
+
+  @Test
+  void updateFigurine_whenFigurineIdNotFound_thenThrowFigurineNotFoundException() {
+    when(repository.findById("some-invalid-id")).thenReturn(Optional.empty());
+
+    // Assert
+    assertThatExceptionOfType(FigurineNotFoundException.class)
+        .isThrownBy(() -> service.updateFigurine("some-invalid-id", null))
+        .withMessage("Figurine not found with id: some-invalid-id");
+  }
+
+  @Test
+  void updateFigurine_whenValidFigurineId_thenUpdateExistingFigurine() {
+    String id = "67ae35f52ddc1d63ac3774fb";
+
+    Figurine existingFigurine = new Figurine();
+    existingFigurine.setId(id);
+    existingFigurine.setBaseName("ToBeUpdated");
+    existingFigurine.setLineUp(LineUp.DDP);
+
+    when(repository.findById(id)).thenReturn(Optional.of(existingFigurine));
+    when(repository.save(existingFigurine)).thenReturn(existingFigurine);
+
+    // Assert
+    Figurine newFigurine = new Figurine();
+    newFigurine.setBaseName("Seiya");
+    newFigurine.setLineUp(LineUp.MYTH_CLOTH_EX);
+    newFigurine.setSeries(Series.SAINT_SEIYA);
+    newFigurine.setCategory(Category.INHERITOR);
+    newFigurine.setRevival(true);
+    newFigurine.setOce(true);
+    newFigurine.setMetal(true);
+    newFigurine.setGolden(true);
+    newFigurine.setGold(true);
+    newFigurine.setBroken(true);
+    newFigurine.setPlain(true);
+    newFigurine.setHk(true);
+    newFigurine.setComic(true);
+    newFigurine.setSet(true);
+    newFigurine.setAnniversary(Anniversary.A_10);
+    newFigurine.setDistributionJPY(
+        new Distribution(
+            null, new BigDecimal("23"), null, null, null, LocalDate.of(2023, 1, 1), null));
+    newFigurine.setDistributionMXN(
+        new Distribution(
+            null, new BigDecimal("21"), null, null, null, LocalDate.of(2021, 1, 1), null));
+    newFigurine.setTamashiiUrl("www.google.com");
+    newFigurine.setDistributionChannel(new DistributionChannel());
+    newFigurine.setOfficialImages(List.of("a"));
+    newFigurine.setOtherImages(List.of("b"));
+    newFigurine.setRemarks("sample");
+
+    Figurine updatedFigurine = service.updateFigurine(id, newFigurine);
+    assertNotNull(updatedFigurine);
+    assertEquals(id, updatedFigurine.getId());
+    assertEquals("Seiya", updatedFigurine.getBaseName());
+    assertEquals(
+        "Seiya ~Original Color Edition~ ~Inheritor of the Gold Cloth~ ~Golden Limited Edition~ Comic Ver. <10th Revival Ver.> Gold24 (Plain Clothes)",
+        updatedFigurine.getDisplayableName());
+    assertEquals(LineUp.MYTH_CLOTH_EX, updatedFigurine.getLineUp());
+    assertEquals(Series.SAINT_SEIYA, updatedFigurine.getSeries());
+    assertEquals(Category.INHERITOR, updatedFigurine.getCategory());
+    assertEquals(Status.FUTURE_RELEASE, updatedFigurine.getStatus());
+    assertTrue(updatedFigurine.isRevival());
+    assertTrue(updatedFigurine.isOce());
+    assertTrue(updatedFigurine.isMetal());
+    assertTrue(updatedFigurine.isGolden());
+    assertTrue(updatedFigurine.isGold());
+    assertTrue(updatedFigurine.isBroken());
+    assertTrue(updatedFigurine.isPlain());
+    assertTrue(updatedFigurine.isHk());
+    assertTrue(updatedFigurine.isComic());
+    assertTrue(updatedFigurine.isSet());
+    assertEquals(Anniversary.A_10, updatedFigurine.getAnniversary());
+    assertNotNull(updatedFigurine.getDistributionJPY());
+    assertEquals(new BigDecimal("23"), updatedFigurine.getDistributionJPY().getBasePrice());
+    assertNotNull(updatedFigurine.getDistributionMXN());
+    assertEquals(new BigDecimal("21"), updatedFigurine.getDistributionMXN().getBasePrice());
+    assertEquals("www.google.com", updatedFigurine.getTamashiiUrl());
+    assertNotNull(updatedFigurine.getDistributionChannel());
+    assertEquals(
+        List.of("https://imagizer.imageshack.com/v2/640x480q70/a.jpg"),
+        updatedFigurine.getOfficialImages());
+    assertEquals(
+        List.of("https://imagizer.imageshack.com/v2/640x480q70/b.jpg"),
+        updatedFigurine.getOtherImages());
+    assertEquals("sample", updatedFigurine.getRemarks());
+
+    verify(repository).findById(id);
+    verify(repository).save(existingFigurine);
   }
 
   @Test
@@ -491,19 +584,19 @@ public class MythCollectionServiceTest {
     Figurine figurine1 = new Figurine();
     figurine1.setBaseName("Seiya");
 
-    LocalDate announcementDate2 = LocalDate.now().minus(6, ChronoUnit.YEARS);
+    LocalDate announcementDate2 = LocalDate.now().minusYears(6);
     Figurine figurine2 = new Figurine();
     figurine2.setBaseName("Shiryu");
     figurine2.setDistributionJPY(
         new Distribution(null, null, null, announcementDate2, null, null, null));
 
-    LocalDate announcementDate3 = LocalDate.now().minus(5, ChronoUnit.YEARS);
+    LocalDate announcementDate3 = LocalDate.now().minusYears(5);
     Figurine figurine3 = new Figurine();
     figurine3.setBaseName("Hyoga");
     figurine3.setDistributionJPY(
         new Distribution(null, null, null, announcementDate3, null, null, null));
 
-    LocalDate announcementDate4 = LocalDate.now().minus(4, ChronoUnit.YEARS);
+    LocalDate announcementDate4 = LocalDate.now().minusYears(4);
     Figurine figurine4 = new Figurine();
     figurine4.setBaseName("Hyoga");
     figurine4.setDistributionJPY(
@@ -551,6 +644,36 @@ public class MythCollectionServiceTest {
     assertEquals(Status.RELEASED, result.get(6).getStatus());
 
     verify(repository).findAll(Sort.by(Sort.Order.asc("distributionJPY.releaseDate")));
+  }
+
+  @Test
+  void getFigurine_whenNonExistingFigurine_thenThrowFigurineNotFoundException() {
+
+    when(repository.findById("some-invalid-id")).thenReturn(Optional.empty());
+
+    // Assert
+    assertThatExceptionOfType(FigurineNotFoundException.class)
+        .isThrownBy(() -> service.getFigurine("some-invalid-id"))
+        .withMessage("Figurine not found with id: some-invalid-id");
+  }
+
+  @Test
+  void getFigurine_whenExistingFigurine_thenReturnFigurine() {
+    String id = "67ae35f52ddc1d63ac3774fb";
+
+    Figurine figurine = new Figurine();
+    figurine.setId(id);
+    figurine.setBaseName("Seiya");
+
+    when(repository.findById(id)).thenReturn(Optional.of(figurine));
+
+    // Assert
+    Figurine result = service.getFigurine(id);
+    assertNotNull(result);
+    assertEquals("67ae35f52ddc1d63ac3774fb", result.getId());
+    assertEquals("Seiya", result.getBaseName());
+
+    verify(repository).findById(id);
   }
 
   @Test
