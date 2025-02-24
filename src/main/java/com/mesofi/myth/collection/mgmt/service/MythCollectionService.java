@@ -21,11 +21,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.chrono.ChronoLocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -170,7 +166,7 @@ public class MythCollectionService {
       allFigurinesFiltered = allFigurines;
     }
 
-    List<Figurine> existingFigurines =
+    List<Figurine> figurineList =
         allFigurinesFiltered.stream()
             .peek(this::populateAdditionalInfo)
             .sorted(
@@ -182,10 +178,29 @@ public class MythCollectionService {
                   }
                   return 0;
                 })
-            .collect(Collectors.toList());
+            .toList();
 
-    log.info("Found {} figurines", existingFigurines.size());
-    return existingFigurines;
+    log.info("Found {} figurines", figurineList.size());
+
+    // We create one more list with sorted figurines based on the status.
+    List<Figurine> list = new ArrayList<>();
+    list.addAll(figurineList.stream().filter($ -> $.getStatus() == Status.RELEASE_TBD).toList());
+    list.addAll(figurineList.stream().filter($ -> $.getStatus() == Status.FUTURE_RELEASE).toList());
+    list.addAll(figurineList.stream().filter($ -> $.getStatus() == Status.RELEASED).toList());
+    list.addAll(getFigurinesFilteredByStatus(figurineList, Status.PROTOTYPE));
+    list.addAll(getFigurinesFilteredByStatus(figurineList, Status.UNRELEASED));
+
+    return list;
+  }
+
+  private List<Figurine> getFigurinesFilteredByStatus(
+      List<Figurine> figurineList, Status prototype) {
+    return figurineList.stream()
+        .filter(figurine -> figurine.getStatus() == prototype)
+        .sorted(
+            Comparator.comparing((Figurine f) -> f.getDistributionJPY().getFirstAnnouncementDate())
+                .reversed())
+        .toList();
   }
 
   /**
@@ -229,24 +244,13 @@ public class MythCollectionService {
     Distribution jpy = figurine.getDistributionJPY();
     LocalDate releaseDate = Optional.ofNullable(jpy).map(Distribution::getReleaseDate).orElse(null);
     if (Objects.nonNull(releaseDate)) {
-      if (Objects.nonNull(jpy.getReleaseDateConfirmed())
-          && jpy.getReleaseDateConfirmed()
-          && releaseDate.isBefore(LocalDate.now())) {
-        return Status.RELEASED;
-      } else {
-        return Status.FUTURE_RELEASE;
-      }
+      return releaseDate.isBefore(LocalDate.now()) ? Status.RELEASED : Status.FUTURE_RELEASE;
     } else {
       LocalDate anncDate =
           Optional.ofNullable(jpy).map(Distribution::getFirstAnnouncementDate).orElse(null);
       if (Objects.nonNull(anncDate)) {
         Period period = Period.between(anncDate, LocalDate.now());
-
-        if (period.getYears() > 5) {
-          return Status.UNRELEASED;
-        } else {
-          return Status.PROTOTYPE;
-        }
+        return period.getYears() > 5 ? Status.UNRELEASED : Status.PROTOTYPE;
       } else {
         return Status.RELEASE_TBD;
       }

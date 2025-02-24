@@ -180,7 +180,7 @@ public class MythCollectionServiceTest {
     assertEquals(LineUp.MYTH_CLOTH_EX, updatedFigurine.getLineUp());
     assertEquals(Series.SAINT_SEIYA, updatedFigurine.getSeries());
     assertEquals(Category.INHERITOR, updatedFigurine.getCategory());
-    assertEquals(Status.FUTURE_RELEASE, updatedFigurine.getStatus());
+    assertEquals(Status.RELEASED, updatedFigurine.getStatus());
     assertTrue(updatedFigurine.isRevival());
     assertTrue(updatedFigurine.isOce());
     assertTrue(updatedFigurine.isMetal());
@@ -636,12 +636,12 @@ public class MythCollectionServiceTest {
     // Assert
     assertEquals(7, result.size());
     assertEquals(Status.RELEASE_TBD, result.getFirst().getStatus());
-    assertEquals(Status.UNRELEASED, result.get(1).getStatus());
-    assertEquals(Status.PROTOTYPE, result.get(2).getStatus());
-    assertEquals(Status.PROTOTYPE, result.get(3).getStatus());
-    assertEquals(Status.FUTURE_RELEASE, result.get(4).getStatus());
-    assertEquals(Status.RELEASED, result.get(5).getStatus());
-    assertEquals(Status.RELEASED, result.get(6).getStatus());
+    assertEquals(Status.RELEASED, result.get(1).getStatus());
+    assertEquals(Status.RELEASED, result.get(2).getStatus());
+    assertEquals(Status.RELEASED, result.get(3).getStatus());
+    assertEquals(Status.PROTOTYPE, result.get(4).getStatus());
+    assertEquals(Status.PROTOTYPE, result.get(5).getStatus());
+    assertEquals(Status.UNRELEASED, result.get(6).getStatus());
 
     verify(repository).findAll(Sort.by(Sort.Order.asc("distributionJPY.releaseDate")));
   }
