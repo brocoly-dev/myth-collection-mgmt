@@ -1,5 +1,6 @@
 package com.mesofi.myth.collection.mgmt.controller;
 
+import com.mesofi.myth.collection.mgmt.model.BasicFigurine;
 import com.mesofi.myth.collection.mgmt.model.Figurine;
 import com.mesofi.myth.collection.mgmt.service.MythCollectionService;
 import jakarta.validation.Valid;
@@ -80,6 +81,12 @@ public class MythCollectionController {
 
     Figurine updatedFigurine = service.updateFigurine(id, figurine);
     return ResponseEntity.ok(updatedFigurine);
+  }
+
+  @GetMapping("/basics")
+  public List<BasicFigurine> getAllBasicFigurines(
+      @RequestParam(required = false) boolean excludeRestocks) {
+    return service.getAllBasicFigurines(excludeRestocks);
   }
 
   /**

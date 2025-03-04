@@ -3,15 +3,7 @@ package com.mesofi.myth.collection.mgmt.service;
 import com.mesofi.myth.collection.mgmt.exceptions.FigurineNotFoundException;
 import com.mesofi.myth.collection.mgmt.exceptions.SourceFigurineBulkException;
 import com.mesofi.myth.collection.mgmt.mappers.FigurineMapper;
-import com.mesofi.myth.collection.mgmt.model.Anniversary;
-import com.mesofi.myth.collection.mgmt.model.Category;
-import com.mesofi.myth.collection.mgmt.model.Distribution;
-import com.mesofi.myth.collection.mgmt.model.Figurine;
-import com.mesofi.myth.collection.mgmt.model.LineUp;
-import com.mesofi.myth.collection.mgmt.model.Restock;
-import com.mesofi.myth.collection.mgmt.model.Series;
-import com.mesofi.myth.collection.mgmt.model.SourceFigurine;
-import com.mesofi.myth.collection.mgmt.model.Status;
+import com.mesofi.myth.collection.mgmt.model.*;
 import com.mesofi.myth.collection.mgmt.repository.MythCollectionRepository;
 import com.opencsv.bean.CsvToBeanBuilder;
 import java.io.IOException;
@@ -551,5 +543,78 @@ public class MythCollectionService {
     }
 
     return name;
+  }
+
+  public List<BasicFigurine> getAllBasicFigurines(boolean excludeRestocks) {
+    log.info("Retrieving all the existing figurines ...");
+
+    Sort sort = Sort.by(Sort.Order.asc("distributionJPY.releaseDate"));
+    List<Figurine> allFigurines = repository.findAll(sort);
+
+    List<Figurine> allFigurinesFiltered = new ArrayList<>();
+    if (excludeRestocks) {
+      for (Figurine currFigurine : allFigurines) {
+        if (allFigurinesFiltered.contains(currFigurine)) {
+          for (Figurine currFiltered : allFigurinesFiltered) {
+            if (currFiltered.equals(currFigurine)) {
+              if (Objects.isNull(currFiltered.getRestocks())) {
+                currFiltered.setRestocks(new ArrayList<>());
+              }
+              Restock restock = new Restock();
+              restock.setDistributionJPY(currFigurine.getDistributionJPY());
+              restock.setDistributionMXN(currFigurine.getDistributionMXN());
+              restock.setTamashiiUrl(currFigurine.getTamashiiUrl());
+              restock.setDistributionChannel(currFigurine.getDistributionChannel());
+              restock.setRemarks(currFigurine.getRemarks());
+
+              currFiltered.getRestocks().add(restock);
+            }
+          }
+        } else {
+          allFigurinesFiltered.add(currFigurine);
+        }
+      }
+    } else {
+      allFigurinesFiltered = allFigurines;
+    }
+
+    List<Figurine> figurineList =
+        allFigurinesFiltered.stream()
+            .peek($ -> $.setDisplayableName(calculateDisplayableName($)))
+            .peek($ -> $.setStatus(calculateStatus($)))
+            .sorted(
+                (f1, f2) -> {
+                  if (geReleaseDate(f1).isPresent() && geReleaseDate(f2).isPresent()) {
+                    return f2.getDistributionJPY()
+                        .getReleaseDate()
+                        .compareTo(f1.getDistributionJPY().getReleaseDate());
+                  }
+                  return 0;
+                })
+            .toList();
+
+    log.info("Found {} figurines", figurineList.size());
+
+    // We create one more list with sorted figurines based on the status.
+    List<Figurine> list = new ArrayList<>();
+    list.addAll(figurineList.stream().filter($ -> $.getStatus() == Status.RELEASE_TBD).toList());
+    list.addAll(figurineList.stream().filter($ -> $.getStatus() == Status.FUTURE_RELEASE).toList());
+    list.addAll(figurineList.stream().filter($ -> $.getStatus() == Status.RELEASED).toList());
+    list.addAll(getFigurinesFilteredByStatus(figurineList, Status.PROTOTYPE));
+    list.addAll(getFigurinesFilteredByStatus(figurineList, Status.UNRELEASED));
+
+    return list.stream().map(this::toBasicFigure).toList();
+  }
+
+  private BasicFigurine toBasicFigure(Figurine figure) {
+    BasicFigurine basicFigurine = new BasicFigurine();
+
+    basicFigurine.setId(figure.getId());
+    basicFigurine.setDisplayableName(figure.getDisplayableName());
+    basicFigurine.setLineUp(figure.getLineUp());
+    basicFigurine.setCategory(figure.getCategory());
+    basicFigurine.setStatus(figure.getStatus());
+
+    return basicFigurine;
   }
 }
