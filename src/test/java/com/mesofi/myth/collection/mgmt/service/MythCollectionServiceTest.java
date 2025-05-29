@@ -935,7 +935,7 @@ public class MythCollectionServiceTest {
     theFigurine.setBaseName("Sagittarius Aiolos");
     theFigurine.setLineUp(LineUp.DDP);
     assertEquals(
-        "Commitment of Aiolos' Spirit in the Palace of the Centaur ~SAGITTARIUS AIOLOS~",
+        "Commitment of Aiolos Spirit in the Palace of the Centaur ~SAGITTARIUS AIOLOS~",
         service.calculateDisplayableName(theFigurine));
 
     theFigurine = new Figurine();

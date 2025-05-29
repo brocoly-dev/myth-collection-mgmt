@@ -204,9 +204,13 @@ public class MythCollectionService {
   public Figurine getFigurine(String id) {
     log.info("Retrieving figure with id: [{}] ...", id);
 
-    return repository
-        .findById(id)
-        .orElseThrow(() -> new FigurineNotFoundException("Figurine not found with id: " + id));
+    Figurine figurineFound =
+        repository
+            .findById(id)
+            .orElseThrow(() -> new FigurineNotFoundException("Figurine not found with id: " + id));
+
+    populateAdditionalInfo(figurineFound);
+    return figurineFound;
   }
 
   /**
@@ -228,8 +232,8 @@ public class MythCollectionService {
 
     figurine.setStatus(calculateStatus(figurine));
 
-    figurine.setOfficialImages(complementImageUrls(figurine.getOfficialImages()));
-    figurine.setOtherImages(complementImageUrls(figurine.getOtherImages()));
+    figurine.setOfficialImages(figurine.getOfficialImages());
+    figurine.setOtherImages(figurine.getOtherImages());
   }
 
   private Status calculateStatus(Figurine figurine) {
@@ -271,7 +275,7 @@ public class MythCollectionService {
         : images.stream()
             .map(
                 img -> {
-                  final String URL = "https://imagizer.imageshack.com/v2/640x480q70/";
+                  final String URL = "https://imagizer.imageshack.com/v2/1600x1200q70/";
                   if (img.contains("png")) {
                     return URL + img;
                   } else {
@@ -519,7 +523,7 @@ public class MythCollectionService {
       } else if (figurine.getBaseName().toLowerCase().contains("sagittarius")) {
         name =
             String.format(
-                "Commitment of Aiolos' Spirit in the Palace of the Centaur ~%s~",
+                "Commitment of Aiolos Spirit in the Palace of the Centaur ~%s~",
                 figurine.getBaseName().toUpperCase());
       } else if (figurine.getBaseName().toLowerCase().contains("capricorn")) {
         name =
@@ -582,6 +586,18 @@ public class MythCollectionService {
         allFigurinesFiltered.stream()
             .peek($ -> $.setDisplayableName(calculateDisplayableName($)))
             .peek($ -> $.setStatus(calculateStatus($)))
+            .peek(
+                $ -> {
+                  Distribution distJPY = $.getDistributionJPY();
+                  Optional.ofNullable(distJPY)
+                      .ifPresent(
+                          $$ -> {
+                            if (Objects.nonNull($$.getBasePrice())) {
+                              distJPY.setFinalPrice(
+                                  calculateFinalPrice($$.getBasePrice(), $$.getReleaseDate()));
+                            }
+                          });
+                })
             .sorted(
                 (f1, f2) -> {
                   if (geReleaseDate(f1).isPresent() && geReleaseDate(f2).isPresent()) {
@@ -613,7 +629,29 @@ public class MythCollectionService {
     basicFigurine.setDisplayableName(figure.getDisplayableName());
     basicFigurine.setLineUp(figure.getLineUp());
     basicFigurine.setCategory(figure.getCategory());
+    basicFigurine.setSeries(figure.getSeries());
     basicFigurine.setStatus(figure.getStatus());
+    basicFigurine.setRevival(figure.isRevival());
+    basicFigurine.setHk(figure.isHk());
+    basicFigurine.setSet(figure.isSet());
+    basicFigurine.setAnniversary(figure.getAnniversary());
+
+    Optional.ofNullable(figure.getDistributionJPY())
+        .map($ -> $.getReleaseDate())
+        .ifPresent(
+            $ -> {
+              basicFigurine.setReleaseDate($);
+            });
+    Optional.ofNullable(figure.getDistributionJPY())
+        .map($ -> $.getReleaseDateConfirmed())
+        .ifPresent(
+            $ -> {
+              basicFigurine.setReleaseDateConfirmed($);
+            });
+
+    Optional.ofNullable(figure.getDistributionJPY())
+        .map($ -> $.getFinalPrice())
+        .ifPresent($ -> basicFigurine.setFinalPrice($));
 
     return basicFigurine;
   }

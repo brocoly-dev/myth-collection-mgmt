@@ -1,6 +1,9 @@
 package com.mesofi.myth.collection.mgmt.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -22,6 +25,18 @@ public class BasicFigurine {
   private String displayableName; // This field is calculated ...
 
   private LineUp lineUp;
+  private Series series;
   private Category category;
   private Status status; // This field is calculated ...
+
+  private boolean revival;
+  private boolean hk;
+  private boolean set;
+
+  private Anniversary anniversary;
+
+  @NotNull private LocalDate releaseDate;
+  @NotNull private Boolean releaseDateConfirmed;
+
+  private BigDecimal finalPrice;
 }
